@@ -1,0 +1,62 @@
+// ─── Ejada Design Tokens ───────────────────────────────────────────
+export const tokens = {
+  color: {
+    navy:       '#001081',
+    navyDeep:   '#000850',
+    navyLight:  '#0018A0',
+    blue:       '#0070C0',
+    sky:        '#009EE0',
+    teal:       '#4A90A4',
+    darkPanel:  '#3D5A80',
+    cream:      '#F5F3F0',
+    white:      '#FFFFFF',
+    offWhite:   '#FAF9F7',
+    charcoal:   '#2D3436',
+    mid:        '#5D5D5D',
+    muted:      '#898989',
+    divider:    'rgba(45,52,54,0.12)',
+  },
+  semantic: {
+    bg:         '#F5F3F0',
+    fg:         '#001081',
+    surface:    '#FFFFFF',
+    accent:     '#0070C0',
+    accentLight:'#009EE0',
+    darkBg:     '#000850',
+    darkText:   '#FFFFFF',
+    divider:    'rgba(45,52,54,0.12)',
+  },
+  font: {
+    family: "'Readex Pro', system-ui, sans-serif",
+    display: { size: 'clamp(56px, 10vw, 120px)', weight: 800, lineHeight: 0.95, tracking: -0.03 },
+    h1:      { size: 'clamp(36px, 6vw, 72px)',   weight: 800, lineHeight: 1.0,  tracking: -0.025 },
+    h2:      { size: 'clamp(28px, 4vw, 48px)',   weight: 700, lineHeight: 1.1,  tracking: -0.02 },
+    h3:      { size: 'clamp(20px, 3vw, 28px)',   weight: 700, lineHeight: 1.2,  tracking: -0.01 },
+    h4:      { size: '18px',                      weight: 600, lineHeight: 1.3 },
+    bodyLg:  { size: '16px',                      weight: 400, lineHeight: 1.6 },
+    body:    { size: '14px',                      weight: 400, lineHeight: 1.6 },
+    small:   { size: '12px',                      weight: 500, lineHeight: 1.5 },
+    label:   { size: '10px',                      weight: 600, lineHeight: 1.4, tracking: '0.2em', uppercase: true },
+  },
+  spacing: {
+    section:  '7.5rem',
+    sectionSm:'5rem',
+    container:'2.5rem',
+    card:     '1.5rem',
+    gap:      '1.5rem',
+  },
+  radius: { sm: '0px', md: '0px', lg: '0px' },
+  shadow: {
+    card:  '0 1px 3px rgba(0,16,129,0.06), 0 4px 16px rgba(0,16,129,0.04)',
+    hover: '0 4px 12px rgba(0,16,129,0.10), 0 8px 32px rgba(0,16,129,0.08)',
+    lift:  '0 8px 24px rgba(0,16,129,0.15), 0 16px 48px rgba(0,16,129,0.10)',
+  },
+  transition: {
+    fast:   '150ms ease',
+    normal: '250ms ease',
+    slow:   '400ms ease',
+    spring: '600ms cubic-bezier(0.16, 1, 0.3, 1)',
+  },
+}
+
+export type Tokens = typeof tokens
