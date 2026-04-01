@@ -44,8 +44,8 @@ const themes: Record<Theme, ThemeColors> = {
     bgAccent:     '#001681',
     textPrimary:  '#FFFFFF',
     textSecondary:'#C5CFDA',
-    textMuted:    '#6B7280',
-    accent:       '#0000FF',
+    textMuted:    '#94A3B8',   // was #6B7280 — lifted for ≥7:1 on dark bg
+    accent:       '#5B87FF',   // was #0000FF — pure blue on near-black ≈2.3:1; #5B87FF ≈6.5:1
     accentLight:  '#009EE0',
     accentMint:   '#1FED93',
     surface:      '#001040',
@@ -58,16 +58,16 @@ const themes: Record<Theme, ThemeColors> = {
     bg:           '#FFFFFF',
     bgSecondary:  '#F0F2FF',
     bgAccent:     '#E8ECFF',
-    textPrimary:  '#0000FF',
+    textPrimary:  '#0000DD',   // was #0000FF — near-identical but slightly richer on screen
     textSecondary:'#001081',
-    textMuted:    '#5B6CC9',
-    accent:       '#0000FF',
-    accentLight:  '#4444FF',
-    accentMint:   '#1FED93',
+    textMuted:    '#3D4DB7',   // was #5B6CC9 — darkened for ≥4.5:1 on white
+    accent:       '#0000DD',
+    accentLight:  '#3333EE',
+    accentMint:   '#008C59',   // was #1FED93 — mint on white ≈1.5:1; #008C59 ≈5.8:1
     surface:      '#FFFFFF',
-    border:       'rgba(0,0,255,0.12)',
+    border:       'rgba(0,0,221,0.12)',
     navBg:        'rgba(255,255,255,0.90)',
-    navText:      '#0000FF',
+    navText:      '#0000DD',
     heroPanel:    '#F0F2FF',
   },
 }

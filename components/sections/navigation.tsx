@@ -23,7 +23,7 @@ const themeOptions: { id: Theme; label: string }[] = [
 const themeSwatchColor: Record<Theme, string> = {
   light: '#F5F1EB',
   dark: '#000820',
-  electric: '#0000FF',
+  electric: '#0000DD',
 }
 
 export default function Navigation() {
