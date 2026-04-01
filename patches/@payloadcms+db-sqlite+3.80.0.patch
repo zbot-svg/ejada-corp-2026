@@ -1,0 +1,23 @@
+diff --git a/node_modules/@payloadcms/db-sqlite/dist/connect.js b/node_modules/@payloadcms/db-sqlite/dist/connect.js
+index 9f4c05b..7f9c738 100644
+--- a/node_modules/@payloadcms/db-sqlite/dist/connect.js
++++ b/node_modules/@payloadcms/db-sqlite/dist/connect.js
+@@ -50,14 +50,14 @@ export const connect = async function connect(options = {
+     if (process.env.NODE_ENV !== 'production' && process.env.PAYLOAD_MIGRATING !== 'true' && this.push !== false) {
+         await pushDevSchema(this);
+     }
+-    if (typeof this.resolveInitializing === 'function') {
+-        this.resolveInitializing();
+-    }
+     if (process.env.NODE_ENV === 'production' && this.prodMigrations) {
+         await this.migrate({
+             migrations: this.prodMigrations
+         });
+     }
++    if (typeof this.resolveInitializing === 'function') {
++        this.resolveInitializing();
++    }
+ };
+ 
+ //# sourceMappingURL=connect.js.map
+\ No newline at end of file
