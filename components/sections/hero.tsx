@@ -1,109 +1,219 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { GridPattern, ScrollIndicator } from '@/components/ui'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { TextReveal, RevealLine } from '@/components/primitives/text-reveal'
+import { FadeUp } from '@/components/primitives/fade-up'
+import { Parallax } from '@/components/primitives/parallax'
+import { MagneticButton, ArrowButton } from '@/components/ui/magnetic-button'
 import { pageContent } from '@/lib/content'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function Hero() {
   const { hero } = pageContent
   const [loaded, setLoaded] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+  const imageRef = useRef<HTMLDivElement>(null)
+
+  // Scroll-linked parallax for the image layer
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  })
+  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '12%'])
+  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
 
   useEffect(() => {
-    const t = setTimeout(() => setLoaded(true), 100)
+    const t = setTimeout(() => setLoaded(true), 200)
     return () => clearTimeout(t)
   }, [])
 
   return (
-    <section id="hero" className="relative min-h-screen flex" style={{ background: '#000850' }}>
-      {/* Background image panel */}
-      <div className="absolute inset-0">
+    <section
+      ref={sectionRef}
+      id="hero"
+      className="relative overflow-hidden"
+      style={{ minHeight: '100svh', backgroundColor: 'var(--color-bg)' }}
+    >
+      {/* ── Parallax image layer (right 55%) ─────────────────────── */}
+      <motion.div
+        ref={imageRef}
+        className="absolute inset-y-0 right-0 w-full lg:w-[58%]"
+        style={{ y: imageY }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/hero-cover.jpg"
+          src="/images/hero-bg.jpg"
           alt=""
-          className="w-full h-full object-cover opacity-30"
+          className="w-full h-[115%] object-cover"
+          style={{ objectPosition: 'center 30%' }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#000850] 0%, from-[#000850]/70 40%, transparent 100%" />
-      </div>
+        {/* Gradient masks — left blend + bottom fade */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to right, var(--color-bg) 0%, var(--color-bg) 5%, transparent 40%)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to bottom, transparent 40%, var(--color-bg) 100%)',
+          }}
+        />
+      </motion.div>
 
-      <GridPattern light />
+      {/* ── Dot grid decoration ───────────────────────────────────── */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, var(--color-text-primary) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
 
-      {/* Left panel */}
-      <div className="relative z-10 flex flex-col justify-between w-full max-w-2xl p-12 lg:p-20"
-        style={{ minHeight: '100svh' }}>
-
-        {/* Logo */}
-        <div className={`transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
-          style={{ transitionDelay: '200ms' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brand/ejada-white-logo.png"
-            alt="Ejada Systems"
-            className="h-10 w-auto"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement
-              target.style.display = 'none'
-              target.parentElement!.innerHTML = '<div class="text-2xl font-black tracking-tight text-white"><span class="text-sky-400">e</span>jada</div>'
-            }}
-          />
-        </div>
-
-        {/* Center content */}
-        <div>
-          {/* Eyebrow */}
-          <div className={`mb-6 transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-            style={{ transitionDelay: '400ms' }}>
-            <span className="text-xs font-bold uppercase tracking-widest text-sky-400">
+      {/* ── Left content panel ────────────────────────────────────── */}
+      <motion.div
+        className="relative z-10 flex flex-col justify-between w-full lg:max-w-[52%] px-6 lg:px-20 pt-28 pb-10 lg:py-32"
+        style={{ minHeight: '100svh', opacity }}
+      >
+        {/* Eyebrow row */}
+        <FadeUp delay={0.3}>
+          <div className="flex items-center gap-3">
+            <div className="h-px w-8" style={{ backgroundColor: 'var(--color-accent)' }} />
+            <span
+              className="text-[10px] font-bold uppercase tracking-[0.22em]"
+              style={{ color: 'var(--color-accent)' }}
+            >
               {hero.eyebrow}
             </span>
           </div>
+        </FadeUp>
 
-          {/* Main headline */}
-          <h1 className={`font-black leading-none tracking-tight mb-6 transition-all duration-700
-            ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-            style={{
-              fontSize: 'clamp(52px, 8vw, 100px)',
-              lineHeight: 0.95,
-              letterSpacing: '-0.03em',
-            }}>
-            {hero.headline.split('\n').map((line, i) => (
-              <span key={i} className="block text-white">
-                {i === 0 ? line : <span className="text-sky-400">{line}</span>}
-              </span>
+        {/* ── Main content ─────────────────────────────────────────── */}
+        <motion.div style={{ y: contentY }}>
+          {/* Headline — word-by-word reveal */}
+          <div className="mb-8">
+            <TextReveal
+              by="word"
+              delay={0.5}
+              stagger={0.08}
+              from="bottom"
+              className="font-black leading-none tracking-tight"
+              style={{
+                fontSize: 'clamp(52px, 8vw, 108px)',
+                letterSpacing: '-0.03em',
+                color: 'var(--color-text-primary)',
+              } as React.CSSProperties}
+            >
+              {hero.headline.replace('\n', ' ')}
+            </TextReveal>
+          </div>
+
+          {/* Accent line + tagline */}
+          <FadeUp delay={0.9}>
+            <div className="flex items-start gap-5 mb-10">
+              <div
+                className="w-0.5 self-stretch flex-shrink-0 mt-1"
+                style={{ backgroundColor: 'var(--color-accent)', minHeight: 48 }}
+              />
+              <div>
+                <p
+                  className="text-lg font-light leading-relaxed mb-1"
+                  style={{ color: 'var(--color-text-secondary)' }}
+                >
+                  {hero.tagline}
+                </p>
+                <p
+                  className="text-sm"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  Riyadh · Kingdom of Saudi Arabia
+                </p>
+              </div>
+            </div>
+          </FadeUp>
+
+          {/* CTA row */}
+          <FadeUp delay={1.1}>
+            <div className="flex flex-wrap items-center gap-4">
+              <MagneticButton href="#capabilities" variant="primary">
+                Explore Capabilities
+              </MagneticButton>
+              <ArrowButton href="#contact">
+                Start a Project
+              </ArrowButton>
+            </div>
+          </FadeUp>
+        </motion.div>
+
+        {/* ── Bottom stats strip ───────────────────────────────────── */}
+        <FadeUp delay={1.4}>
+          <div
+            className="flex flex-wrap gap-8 pt-8"
+            style={{ borderTop: '1px solid var(--color-border)' }}
+          >
+            {[
+              { value: '20+', label: 'Years' },
+              { value: '500+', label: 'Projects' },
+              { value: '1K+', label: 'Professionals' },
+              { value: '7', label: 'Countries' },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <div
+                  className="text-2xl font-black tracking-tight"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  {stat.value}
+                </div>
+                <div
+                  className="text-[10px] font-semibold uppercase tracking-widest mt-0.5"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  {stat.label}
+                </div>
+              </div>
             ))}
-          </h1>
-
-          {/* Tagline */}
-          <div className={`transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-            style={{ transitionDelay: '600ms' }}>
-            <p className="text-lg font-light text-white/70 mb-2" style={{ fontFamily: "'Readex Pro', sans-serif" }}>
-              {hero.tagline}
-            </p>
-            <div className="h-px w-16 bg-sky-400 mt-4" />
           </div>
-        </div>
+        </FadeUp>
+      </motion.div>
 
-        {/* Footer */}
-        <div className={`flex items-end justify-between transition-all duration-700
-          ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-          style={{ transitionDelay: '800ms' }}>
+      {/* ── Scroll indicator ─────────────────────────────────────────── */}
+      <motion.div
+        className="absolute bottom-8 right-8 hidden lg:flex flex-col items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: loaded ? 1 : 0 }}
+        transition={{ delay: 1.8 }}
+      >
+        <span
+          className="text-[9px] font-bold uppercase tracking-[0.25em]"
+          style={{ color: 'var(--color-text-muted)', writingMode: 'vertical-rl' }}
+        >
+          Scroll
+        </span>
+        <motion.div
+          className="w-px h-12"
+          style={{ backgroundColor: 'var(--color-text-muted)' }}
+          animate={{ scaleY: [0, 1, 0], originY: 0 }}
+          transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.5 }}
+        />
+      </motion.div>
 
-          <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-white/40 mb-1">Al Riyāḍ, Kingdom of Saudi Arabia</div>
-            <div className="text-xs text-white/40">{hero.website}</div>
-          </div>
-
-          <ScrollIndicator />
-        </div>
-      </div>
-
-      {/* Right decorative panel — year */}
-      <div className="absolute right-0 bottom-0 hidden lg:block">
-        <div className="text-[200px] font-black text-white/[0.03] leading-none select-none pointer-events-none"
-          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>
-          {hero.year}
-        </div>
+      {/* ── Ambient year text ─────────────────────────────────────────── */}
+      <div
+        className="absolute bottom-0 right-0 text-[clamp(80px,14vw,180px)] font-black leading-none select-none pointer-events-none hidden lg:block"
+        style={{
+          color: 'var(--color-text-primary)',
+          opacity: 0.03,
+          lineHeight: 0.85,
+        }}
+      >
+        {hero.year}
       </div>
     </section>
   )

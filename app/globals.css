@@ -1,6 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* ─── Semantic Theme Variables (set by ThemeProvider) ──────────── */
+:root {
+  --color-bg:            #F5F1EB;
+  --color-bg-secondary:  #FFFFFF;
+  --color-bg-accent:     #EEE9E0;
+  --color-text-primary:  #001081;
+  --color-text-secondary:#2D3436;
+  --color-text-muted:    #6B7280;
+  --color-accent:        #0000FF;
+  --color-accent-light:  #0070C0;
+  --color-accent-mint:   #1FED93;
+  --color-surface:       #FFFFFF;
+  --color-border:        rgba(0,16,129,0.10);
+  --color-nav-bg:        rgba(245,241,235,0.88);
+  --color-nav-text:      #001081;
+  --color-hero-panel:    #F5F1EB;
+}
+
+/* Theme transitions — applied during switch */
+[data-theme] * {
+  transition:
+    background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Marquee animation ─────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Hide scrollbar (used in SectorTabs) */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-style: none; }
+
 /* ─── Ejada Design Tokens ───────────────────────────────────── */
 @theme {
   /* Brand Colors */
@@ -54,8 +90,8 @@
   }
 
   body {
-    color: var(--color-charcoal);
-    background: var(--color-cream);
+    color: var(--color-text-secondary);
+    background: var(--color-bg);
     overflow-x: hidden;
   }
 
@@ -165,6 +201,45 @@
   to   { width: 100%; }
 }
 
+/* ─── RTL Support ─────────────────────────────────────────────── */
+[dir="rtl"] .reveal-left {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[dir="rtl"] .reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+[dir="rtl"] .reveal-right {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[dir="rtl"] .reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+[dir="rtl"] {
+  font-family: 'Noto Sans Arabic', 'Readex Pro', system-ui, sans-serif;
+}
+
+[dir="rtl"] .section-pad {
+  padding-top: var(--spacing-section);
+  padding-bottom: var(--spacing-section);
+}
+
+[dir="rtl"] .section-pad-sm {
+  padding-top: var(--spacing-section-sm);
+  padding-bottom: var(--spacing-section-sm);
+}
+
 /* ─── Scroll Reveal ──────────────────────────────────────────── */
 .reveal {
   opacity: 0;
@@ -200,4 +275,12 @@
 .reveal-right.visible {
   opacity: 1;
   transform: translateX(0);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(-40px) scale(1.05); }
+}
+.animate-float {
+  animation-name: float;
 }

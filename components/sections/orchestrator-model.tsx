@@ -1,66 +1,131 @@
 'use client'
 
-import { SectionLabel, useReveal } from '@/components/ui'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { SectionLabel } from '@/components/ui/section-label'
+import { TextReveal } from '@/components/primitives/text-reveal'
+import { FadeUp, Stagger } from '@/components/primitives/fade-up'
 import { pageContent } from '@/lib/content'
 
 export default function OrchestratorModel() {
   const { orchestratorModel } = pageContent
-  const { ref, visible, className } = useReveal({ threshold: 0.1 })
-  const { ref: pRef, visible: pVisible } = useReveal({ threshold: 0.1, delay: 200 })
+  const sectionRef = useRef<HTMLElement>(null)
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  })
+  const lineWidth = useTransform(scrollYProgress, [0.1, 0.7], ['0%', '100%'])
 
   return (
-    <section className="relative bg-cream overflow-hidden section-pad">
-      <div className="container mx-auto px-6 lg:px-10">
-        <div ref={ref} className={className}>
-          <SectionLabel>{orchestratorModel.label}</SectionLabel>
-          <h2 className="text-h2 font-black text-navy leading-tight tracking-tight mb-4"
-            style={{ fontSize: 'clamp(28px, 4vw, 48px)' }}>
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden section-pad"
+      style={{ backgroundColor: 'var(--color-bg)' }}
+    >
+      {/* Subtle background grid */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)',
+          backgroundSize: '64px 64px',
+          opacity: 0.5,
+        }}
+      />
+
+      <div className="container mx-auto px-6 lg:px-10 relative z-10">
+        {/* Header */}
+        <div className="max-w-2xl mb-20">
+          <FadeUp delay={0.05}><SectionLabel>{orchestratorModel.label}</SectionLabel></FadeUp>
+
+          <TextReveal
+            by="word" delay={0.1} stagger={0.05}
+            className="font-black leading-tight tracking-tight mb-6"
+            style={{
+              fontSize: 'clamp(28px,4vw,52px)',
+              letterSpacing: '-0.025em',
+              color: 'var(--color-text-primary)',
+            } as React.CSSProperties}
+          >
             {orchestratorModel.headline}
-          </h2>
-          <p className="text-base text-mid leading-relaxed max-w-2xl">
-            {orchestratorModel.body}
-          </p>
+          </TextReveal>
+
+          <FadeUp delay={0.35}>
+            <p className="text-base leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+              {orchestratorModel.body}
+            </p>
+          </FadeUp>
+        </div>
+
+        {/* Animated connector line */}
+        <div className="relative hidden lg:block mb-8">
+          <div className="absolute top-1/2 left-0 right-0 h-px -translate-y-1/2"
+            style={{ backgroundColor: 'var(--color-border)' }} />
+          <motion.div
+            className="absolute top-1/2 left-0 h-px -translate-y-1/2"
+            style={{
+              width: lineWidth,
+              backgroundColor: 'var(--color-accent)',
+            }}
+          />
         </div>
 
         {/* Pillars */}
-        <div ref={pRef} className={`mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 ${pVisible ? '' : 'opacity-0'}`}>
+        <Stagger stagger={0.1} direction="up" distance={32} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {orchestratorModel.pillars.map((pillar, i) => (
-            <PillarCard key={pillar.number} pillar={pillar} index={i} visible={pVisible} />
-          ))}
-        </div>
+            <motion.div
+              key={pillar.number}
+              className="relative p-6 border group cursor-default"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                borderColor: 'var(--color-border)',
+              }}
+              whileHover={{
+                borderColor: 'var(--color-accent)',
+                y: -4,
+                transition: { duration: 0.2 },
+              }}
+            >
+              {/* Top accent on hover */}
+              <motion.div
+                className="absolute top-0 left-0 right-0 h-0.5"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+                initial={{ scaleX: 0, originX: 0 }}
+                whileHover={{ scaleX: 1 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              />
 
-        {/* Connector line */}
-        <div className="hidden lg:block mt-[-2rem] ml-[12.5%] mr-[12.5%] relative z-10">
-          <div className="h-0.5 bg-gradient-to-r from-blue-600 via-sky-400 to-navy" />
-        </div>
+              {/* Number */}
+              <div className="flex items-center gap-3 mb-6">
+                <span
+                  className="text-xs font-mono"
+                  style={{ color: 'var(--color-accent)' }}
+                >
+                  {pillar.number}
+                </span>
+                <div className="h-px flex-1" style={{ backgroundColor: 'var(--color-border)' }} />
+                {/* Arrow for connected flow */}
+                {i < orchestratorModel.pillars.length - 1 && (
+                  <div className="hidden lg:block" style={{ color: 'var(--color-text-muted)' }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              <h3
+                className="text-lg font-black mb-3 group-hover:text-[var(--color-accent)] transition-colors duration-200"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
+                {pillar.title}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                {pillar.description}
+              </p>
+            </motion.div>
+          ))}
+        </Stagger>
       </div>
     </section>
-  )
-}
-
-function PillarCard({ pillar, index, visible }: {
-  pillar: { number: string; title: string; description: string }
-  index: number
-  visible: boolean
-}) {
-  return (
-    <div className={`relative bg-white border border-gray-200 p-8 group
-      transition-all duration-500 hover:shadow-lg hover:border-blue-500/40 hover:-translate-y-1
-      ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-      style={{ transitionDelay: `${index * 120}ms` }}
-    >
-      {/* Connector dot on left */}
-      <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white border-2 border-blue-600
-        hidden lg:flex items-center justify-center">
-        <div className="w-2 h-2 rounded-full bg-sky-400" />
-      </div>
-
-      <div className="text-4xl font-black text-blue-600/20 mb-4">{pillar.number}</div>
-      <h3 className="text-xl font-bold text-navy mb-3">{pillar.title}</h3>
-      <p className="text-sm text-mid leading-relaxed">{pillar.description}</p>
-
-      {/* Bottom accent */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-sky-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-    </div>
   )
 }

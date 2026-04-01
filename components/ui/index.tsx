@@ -297,3 +297,33 @@ export function GridPattern({ light = false }: { light?: boolean }) {
     />
   )
 }
+
+// FloatingOrb — animated gradient blob
+export function FloatingOrb({ size = 600, color = '#0070C0', blur = 120, duration = 8, className = '' }: {
+  size?: number, color?: string, blur?: number, duration?: number, className?: string
+}) {
+  return (
+    <div
+      className={`absolute rounded-full pointer-events-none animate-float ${className}`}
+      style={{
+        width: size, height: size,
+        background: `radial-gradient(circle, ${color}55 0%, ${color}11 50%, transparent 70%)`,
+        filter: `blur(${blur}px)`,
+        animationDuration: `${duration}s`,
+        animationTimingFunction: 'ease-in-out',
+        animationIterationCount: 'infinite',
+        animationDirection: 'alternate',
+      }}
+    />
+  )
+}
+
+// AnimatedCounter — simple counter
+export function AnimatedCounter({ value, label }: { value: string, label: string }) {
+  return (
+    <div className="text-center">
+      <div className="text-5xl lg:text-7xl font-black text-white mb-2">{value}</div>
+      <div className="text-xs text-white/35 uppercase tracking-widest">{label}</div>
+    </div>
+  )
+}

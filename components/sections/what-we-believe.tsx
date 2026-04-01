@@ -1,59 +1,99 @@
 'use client'
 
-import { useRef } from 'react'
-import { SectionLabel, useReveal } from '@/components/ui'
+import { motion } from 'framer-motion'
+import { SectionLabel } from '@/components/ui/section-label'
+import { TextReveal } from '@/components/primitives/text-reveal'
+import { Stagger } from '@/components/primitives/fade-up'
+import { MarqueeText } from '@/components/primitives/marquee'
 import { pageContent } from '@/lib/content'
 
 export default function WhatWeBelieve() {
   const { whatWeBelieve } = pageContent
-  const { ref, visible, className } = useReveal({ threshold: 0.1 })
 
   return (
-    <section className="relative bg-navy-deep overflow-hidden py-24 lg:py-32">
-      {/* Grid bg */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
+    <section
+      className="relative overflow-hidden py-28 lg:py-36"
+      style={{ backgroundColor: 'var(--color-text-primary)' }}
+    >
+      {/* Ambient marquee backdrop */}
+      <div className="absolute inset-0 flex flex-col justify-center gap-0 pointer-events-none overflow-hidden select-none">
+        {['VISION', 'MISSION', 'PURPOSE'].map((word, i) => (
+          <MarqueeText
+            key={word}
+            items={[word, '·', word, '·', word, '·']}
+            speed={60 + i * 15}
+            reverse={i % 2 !== 0}
+            className="opacity-[0.04]"
+            textClassName="text-[clamp(60px,10vw,120px)] font-black text-white whitespace-nowrap"
+          />
+        ))}
+      </div>
+
+      {/* Dot grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.06]"
         style={{
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
         }}
       />
 
-      <div className="container mx-auto px-6 lg:px-10">
-        <div ref={ref} className={className}>
+      <div className="container mx-auto px-6 lg:px-10 relative z-10">
+        <div className="mb-16">
           <SectionLabel light>{whatWeBelieve.label}</SectionLabel>
-          <h2 className="text-white font-black leading-tight tracking-tight mb-16"
-            style={{ fontSize: 'clamp(28px, 4vw, 48px)', letterSpacing: '-0.02em' }}>
+          <TextReveal
+            by="word"
+            delay={0.1}
+            stagger={0.06}
+            className="font-black leading-tight tracking-tight"
+            style={{
+              fontSize: 'clamp(28px,4vw,52px)',
+              letterSpacing: '-0.025em',
+              color: 'white',
+            } as React.CSSProperties}
+          >
             {whatWeBelieve.headline}
-          </h2>
+          </TextReveal>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {whatWeBelieve.beliefs.map((belief, i) => (
-            <BeliefCard key={belief.number} belief={belief} index={i} />
+        <Stagger stagger={0.12} direction="up" distance={40} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {whatWeBelieve.beliefs.map((belief) => (
+            <motion.div
+              key={belief.number}
+              className="relative p-8 border group cursor-default"
+              style={{
+                borderColor: 'rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(255,255,255,0.04)',
+              }}
+              whileHover={{
+                borderColor: 'var(--color-accent)',
+                backgroundColor: 'rgba(255,255,255,0.07)',
+                y: -4,
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Left accent bar */}
+              <motion.div
+                className="absolute left-0 top-0 bottom-0 w-0.5"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+                initial={{ scaleY: 0 }}
+                whileHover={{ scaleY: 1 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              />
+
+              <div
+                className="text-5xl font-black mb-6 leading-none"
+                style={{ color: 'rgba(255,255,255,0.08)' }}
+              >
+                {belief.number}
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{belief.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                {belief.body}
+              </p>
+            </motion.div>
           ))}
-        </div>
+        </Stagger>
       </div>
     </section>
-  )
-}
-
-function BeliefCard({ belief, index }: { belief: { number: string; title: string; body: string }; index: number }) {
-  const { ref, visible, className } = useReveal({ threshold: 0.15, delay: index * 100 })
-
-  return (
-    <div
-      ref={ref}
-      className={`relative bg-white/5 border border-white/10 p-8 group hover:border-sky-400/50
-        transition-all duration-300 hover:bg-white/8 hover:shadow-xl
-        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-      style={{ transitionDelay: visible ? `${index * 100}ms` : '0ms' }}
-    >
-      {/* Accent line on hover */}
-      <div className="absolute top-0 left-0 w-0.5 h-0 bg-sky-400 group-hover:h-full transition-all duration-500" />
-
-      <div className="text-5xl font-black text-white/10 mb-6">{belief.number}</div>
-      <h3 className="text-xl font-bold text-white mb-3">{belief.title}</h3>
-      <p className="text-sm text-white/60 leading-relaxed">{belief.body}</p>
-    </div>
   )
 }

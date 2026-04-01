@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ThemeProvider } from '@/components/providers/theme-provider'
+import { SmoothScroll } from '@/components/providers/smooth-scroll'
+import { MagneticCursor } from '@/components/providers/cursor'
+import { ScrollProgress } from '@/components/ui/scroll-progress'
 
 export const metadata: Metadata = {
   title: 'Ejada Systems — National Transformation Orchestrator',
@@ -15,17 +19,23 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200;300;400;500;600;700;800&family=Noto+Sans+Arabic:wght@200;300;400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased">
-        {children}
+      <body className="antialiased" style={{ cursor: 'none' }}>
+        <ThemeProvider defaultTheme="light">
+          <SmoothScroll>
+            <MagneticCursor />
+            <ScrollProgress />
+            {children}
+          </SmoothScroll>
+        </ThemeProvider>
       </body>
     </html>
   )

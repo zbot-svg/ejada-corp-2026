@@ -1,115 +1,178 @@
 'use client'
 
-import { useState } from 'react'
-import { SectionLabel, TabNav, CaseStudyCard, useReveal } from '@/components/ui'
+import { motion } from 'framer-motion'
+import { SectionLabel } from '@/components/ui/section-label'
+import { TextReveal } from '@/components/primitives/text-reveal'
+import { FadeUp } from '@/components/primitives/fade-up'
+import { SectorTabs } from '@/components/ui/sector-tabs'
+import { CaseStudyCard } from '@/components/ui/case-study-card'
+import { Parallax } from '@/components/primitives/parallax'
+import { ArrowButton } from '@/components/ui/magnetic-button'
 import { pageContent } from '@/lib/content'
 
-export default function Sectors() {
-  const { sectors } = pageContent
-  const [active, setActive] = useState(sectors[0].id)
-  const activeSector = sectors.find((s) => s.id === active)!
+function SectorContent({ id }: { id: string }) {
+  const sector = pageContent.sectors.find(s => s.id === id)
+  if (!sector) return null
+  const { highlight, caseStudies } = sector
 
   return (
-    <section id="sectors" className="relative bg-cream overflow-hidden section-pad">
-      <div className="container mx-auto px-6 lg:px-10">
-        <SectionLabel>Sectors</SectionLabel>
+    <div>
+      {/* Sector highlight — 2 col */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-14">
+        <div>
+          <div
+            className="text-xs font-bold uppercase tracking-widest mb-3"
+            style={{ color: 'var(--color-accent)' }}
+          >
+            {highlight.tagline}
+          </div>
+          <h2
+            className="font-black leading-tight tracking-tight mb-5"
+            style={{
+              fontSize: 'clamp(22px,3vw,38px)',
+              letterSpacing: '-0.02em',
+              color: 'var(--color-text-primary)',
+            }}
+          >
+            {highlight.headline}
+          </h2>
+          <p className="text-sm leading-relaxed mb-8" style={{ color: 'var(--color-text-muted)' }}>
+            {highlight.body}
+          </p>
 
-        {/* Tab nav */}
-        <TabNav
-          tabs={sectors.map((s) => ({ id: s.id, label: s.label }))}
-          active={active}
-          onChange={setActive}
-        />
-
-        {/* Sector content */}
-        <div key={active} className="animate-fade-in">
-          <SectorHighlight sector={activeSector} />
-          {activeSector.caseStudies.length > 0 && (
-            <div className="mt-12">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-muted mb-6">Case Studies</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {activeSector.caseStudies.map((cs, i) => (
-                  <CaseStudyCard
-                    key={cs.title}
-                    badge={cs.status}
-                    title={cs.title}
-                    client={cs.client}
-                    outcomes={cs.outcomes}
-                    visible={true}
-                    delay={i * 120}
-                  />
-                ))}
+          {/* Metrics */}
+          <div className="flex flex-wrap gap-8 mb-8 pb-8 border-b" style={{ borderColor: 'var(--color-border)' }}>
+            {highlight.metrics.map((m) => (
+              <div key={m.label}>
+                <div
+                  className="text-3xl font-black leading-none"
+                  style={{ color: 'var(--color-text-primary)' }}
+                >
+                  {m.value}
+                </div>
+                <div className="text-[10px] font-semibold uppercase tracking-widest mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                  {m.label}
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+
+          {/* Outcome tags */}
+          <div className="flex flex-wrap gap-2">
+            {highlight.outcomes.map((outcome) => (
+              <span
+                key={outcome}
+                className="px-3 py-1.5 text-xs font-semibold"
+                style={{
+                  backgroundColor: 'var(--color-bg-accent)',
+                  color: 'var(--color-text-secondary)',
+                  border: '1px solid var(--color-border)',
+                }}
+              >
+                {outcome}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Image */}
+        <div className="relative aspect-[4/3] overflow-hidden" style={{ backgroundColor: 'var(--color-bg-accent)' }}>
+          <Parallax speed={0.1} className="w-full h-full">
+            <img
+              src={`/images/sectors/${id}.jpg`}
+              alt={sector.label}
+              className="w-full h-full object-cover"
+              style={{ opacity: 0.7 }}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+            />
+          </Parallax>
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to top, var(--color-text-primary) 0%, transparent 60%)' }}
+          />
+          <div className="absolute bottom-6 left-6">
+            <span
+              className="text-7xl font-black opacity-20 text-white leading-none"
+            >
+              {sector.label[0]}
+            </span>
+          </div>
+          <motion.div
+            className="absolute top-4 right-4 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white"
+            style={{ backgroundColor: 'var(--color-accent)' }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {sector.label}
+          </motion.div>
         </div>
       </div>
-    </section>
+
+      {/* Case studies */}
+      {caseStudies.length > 0 && (
+        <div>
+          <div
+            className="text-xs font-bold uppercase tracking-widest mb-6"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
+            Case Studies
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {caseStudies.map((cs, i) => (
+              <CaseStudyCard
+                key={cs.title}
+                badge={cs.status}
+                title={cs.title}
+                client={cs.client}
+                outcomes={cs.outcomes}
+                index={i}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 
-function SectorHighlight({ sector }: { sector: typeof pageContent.sectors[0] }) {
-  const { ref, visible, className } = useReveal({ threshold: 0.1 })
-
+export default function Sectors() {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-      <div ref={ref} className={className}>
-        <div className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-3">
-          {sector.highlight.tagline}
+    <section
+      id="sectors"
+      className="relative overflow-hidden section-pad"
+      style={{ backgroundColor: 'var(--color-bg)' }}
+    >
+      <div className="container mx-auto px-6 lg:px-10">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10">
+          <div className="max-w-xl">
+            <FadeUp delay={0.05}>
+              <SectionLabel>Sectors</SectionLabel>
+            </FadeUp>
+            <TextReveal
+              by="word" delay={0.1} stagger={0.05}
+              className="font-black leading-tight tracking-tight"
+              style={{
+                fontSize: 'clamp(28px,4vw,52px)',
+                letterSpacing: '-0.025em',
+                color: 'var(--color-text-primary)',
+              } as React.CSSProperties}
+            >
+              Deep expertise, sector by sector.
+            </TextReveal>
+          </div>
+          <FadeUp delay={0.3}>
+            <ArrowButton href="#contact">All Sectors</ArrowButton>
+          </FadeUp>
         </div>
-        <h2 className="text-h2 font-black text-navy leading-tight tracking-tight mb-4"
-          style={{ fontSize: 'clamp(24px, 3.5vw, 40px)' }}>
-          {sector.highlight.headline}
-        </h2>
-        <p className="text-base text-mid leading-relaxed mb-8">
-          {sector.highlight.body}
-        </p>
 
-        {/* Metrics */}
-        <div className="flex flex-wrap gap-6 mb-8">
-          {sector.highlight.metrics.map((m) => (
-            <div key={m.label}>
-              <div className="text-3xl font-black text-navy">{m.value}</div>
-              <div className="text-xs text-muted mt-0.5">{m.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Outcomes */}
-        <div className="flex flex-wrap gap-2">
-          {sector.highlight.outcomes.map((outcome) => (
-            <span key={outcome} className="px-3 py-1.5 text-xs font-semibold bg-navy/5 text-navy border border-navy/10">
-              {outcome}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Visual */}
-      <div
-        className="relative aspect-[4/3] bg-navy-deep overflow-hidden reveal-right"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`/images/sectors/${sector.id}.jpg`}
-          alt={sector.label}
-          className="w-full h-full object-cover opacity-40"
-          onError={(e) => {
-            const t = e.target as HTMLImageElement
-            t.style.display = 'none'
-            t.parentElement!.innerHTML = `
-              <div class="absolute inset-0 flex items-center justify-center">
-                <span class="text-white/15 text-[120px] font-black">${sector.id[0].toUpperCase()}</span>
-              </div>
-              <div class="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/50 to-transparent" />
-            `
-          }}
+        {/* Tabs — morphing indicator + directional crossfade */}
+        <SectorTabs
+          tabs={pageContent.sectors.map(s => ({ id: s.id, label: s.label }))}
+          renderContent={(id) => <SectorContent id={id} />}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/80 to-transparent" />
-        <div className="absolute bottom-6 left-6">
-          <div className="text-5xl font-black text-white/20">{sector.label[0]}</div>
-        </div>
       </div>
-    </div>
+    </section>
   )
 }

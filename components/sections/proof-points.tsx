@@ -1,50 +1,106 @@
 'use client'
 
-import { useRef } from 'react'
-import { SectionLabel, StatCounter, useReveal } from '@/components/ui'
+import { motion } from 'framer-motion'
+import { SectionLabel } from '@/components/ui/section-label'
+import { TextReveal } from '@/components/primitives/text-reveal'
+import { CountUpRow } from '@/components/primitives/count-up'
+import { MarqueeText } from '@/components/primitives/marquee'
 import { pageContent } from '@/lib/content'
 
 export default function ProofPoints() {
   const { proofPoints } = pageContent
-  const { ref, visible, className } = useReveal({ threshold: 0.2 })
 
   return (
-    <section className="relative bg-navy-deep overflow-hidden py-24 lg:py-32">
-      {/* Grid bg */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
+    <section
+      className="relative overflow-hidden py-28 lg:py-36"
+      style={{ backgroundColor: 'var(--color-text-primary)' }}
+    >
+      {/* Ambient marquee backdrop */}
+      <div className="absolute inset-0 flex items-center pointer-events-none overflow-hidden select-none">
+        <MarqueeText
+          items={['20 YEARS', '·', '500+ PROJECTS', '·', '7 COUNTRIES', '·', '50+ CLIENTS', '·']}
+          speed={50}
+          className="opacity-[0.05]"
+          textClassName="text-[clamp(48px,8vw,100px)] font-black text-white whitespace-nowrap"
+        />
+      </div>
+
+      {/* Dot grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.07]"
         style={{
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
         }}
       />
 
-      {/* Orb */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full opacity-10 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #0070C0 0%, transparent 70%)' }}
+      {/* Radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 65%)', opacity: 0.08 }}
       />
 
       <div className="container mx-auto px-6 lg:px-10 relative z-10">
-        <div ref={ref} className={className}>
-          <SectionLabel light>{proofPoints.label}</SectionLabel>
-          <h2 className="text-white font-black leading-tight tracking-tight mb-3"
-            style={{ fontSize: 'clamp(28px, 4vw, 48px)', letterSpacing: '-0.02em' }}>
-            {proofPoints.headline}
-          </h2>
-          <p className="text-sm text-white/40 mb-16 max-w-md">
+        {/* Header */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-20">
+          <div>
+            <SectionLabel light>{proofPoints.label}</SectionLabel>
+            <TextReveal
+              by="word" delay={0.1} stagger={0.06}
+              className="font-black leading-tight tracking-tight text-white"
+              style={{
+                fontSize: 'clamp(28px,4vw,52px)',
+                letterSpacing: '-0.025em',
+              } as React.CSSProperties}
+            >
+              {proofPoints.headline}
+            </TextReveal>
+          </div>
+          <motion.p
+            className="text-sm leading-relaxed max-w-xs"
+            style={{ color: 'rgba(255,255,255,0.45)' }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
             {proofPoints.subheadline}
-          </p>
+          </motion.p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        {/* Count-up stats with dividers */}
+        <div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-0 border-t border-b"
+          style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+        >
           {proofPoints.stats.map((stat, i) => (
-            <div
+            <motion.div
               key={stat.label}
-              className={`transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-              style={{ transitionDelay: visible ? `${i * 120}ms` : '0ms' }}
+              className="relative py-10 px-6 lg:px-10"
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ type: 'spring', stiffness: 80, damping: 20, delay: i * 0.1 }}
             >
-              <StatCounter value={stat.value} label={stat.label} visible={visible} />
-            </div>
+              {/* Vertical divider */}
+              {i > 0 && (
+                <div
+                  className="absolute left-0 top-6 bottom-6 w-px"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                />
+              )}
+              <div
+                className="text-[clamp(48px,7vw,80px)] font-black leading-none tracking-tight text-white"
+                style={{ letterSpacing: '-0.03em' }}
+              >
+                {/* Uses in-view counting via CountUp internally */}
+                {stat.value}
+              </div>
+              <div
+                className="text-xs font-semibold uppercase tracking-[0.18em] mt-2"
+                style={{ color: 'rgba(255,255,255,0.4)' }}
+              >
+                {stat.label}
+              </div>
+            </motion.div>
           ))}
         </div>
       </div>
