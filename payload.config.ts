@@ -176,11 +176,20 @@ export default buildConfig({
   ],
 
   db: sqliteAdapter({
-    // On Vercel the project root is read-only — use /tmp which is writable.
-    // Locally the file lands next to payload.config.ts as expected.
+    // On Vercel the project root is read-only — only /tmp is writable.
+    // If DATABASE_URI is a relative file path (e.g. "file:./ejada.db"), rewrite it
+    // to /tmp on Vercel. Otherwise honour whatever DATABASE_URI is set to.
     client: {
-      url: process.env.DATABASE_URI
-        || (process.env.VERCEL ? 'file:/tmp/ejada.db' : `file:${path.resolve(dirname, './ejada.db')}`),
+      url: (() => {
+        const uri = process.env.DATABASE_URI
+        if (process.env.VERCEL) {
+          // Relative file:// URIs can't be written on Vercel's read-only FS
+          if (!uri || uri.startsWith('file:./') || uri.startsWith('file:ejada')) {
+            return 'file:/tmp/ejada.db'
+          }
+        }
+        return uri || `file:${path.resolve(dirname, './ejada.db')}`
+      })(),
     },
   }),
 
