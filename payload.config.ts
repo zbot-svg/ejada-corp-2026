@@ -2,22 +2,18 @@ import { buildConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import type { MigrateUpArgs } from '@payloadcms/db-sqlite'
+// Static import so Turbopack includes drizzle-kit/api in the Lambda bundle
+import { pushSQLiteSchema } from 'drizzle-kit/api'
 import { fileURLToPath } from 'url'
-import { createRequire } from 'module'
 import path from 'path'
-
-const _require = createRequire(import.meta.url)
 
 /**
  * Production migration: push the full schema on first cold start.
- * drizzle-kit/api is available at runtime (bundled by @payloadcms/drizzle).
+ * Uses drizzle-kit/api directly (statically imported so it's bundled).
  * This runs instead of the dev-only `pushDevSchema` which is gated by NODE_ENV.
  */
 async function initialSchemaMigration({ payload }: MigrateUpArgs): Promise<void> {
   const adapter = (payload as any).db
-  const { pushSQLiteSchema } = _require('drizzle-kit/api') as {
-    pushSQLiteSchema: (schema: unknown, db: unknown) => Promise<{ apply: () => Promise<void>; warnings: string[]; hasDataLoss: boolean }>
-  }
   const { apply, warnings } = await pushSQLiteSchema(adapter.schema, adapter.drizzle)
   if (warnings.length) {
     payload.logger.warn({ msg: `Schema push warnings: ${warnings.join(', ')}` })
