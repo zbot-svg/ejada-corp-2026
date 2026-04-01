@@ -1,8 +1,29 @@
 import { buildConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import type { MigrateUpArgs } from '@payloadcms/db-sqlite'
 import { fileURLToPath } from 'url'
+import { createRequire } from 'module'
 import path from 'path'
+
+const _require = createRequire(import.meta.url)
+
+/**
+ * Production migration: push the full schema on first cold start.
+ * drizzle-kit/api is available at runtime (bundled by @payloadcms/drizzle).
+ * This runs instead of the dev-only `pushDevSchema` which is gated by NODE_ENV.
+ */
+async function initialSchemaMigration({ payload }: MigrateUpArgs): Promise<void> {
+  const adapter = (payload as any).db
+  const { pushSQLiteSchema } = _require('drizzle-kit/api') as {
+    pushSQLiteSchema: (schema: unknown, db: unknown) => Promise<{ apply: () => Promise<void>; warnings: string[]; hasDataLoss: boolean }>
+  }
+  const { apply, warnings } = await pushSQLiteSchema(adapter.schema, adapter.drizzle)
+  if (warnings.length) {
+    payload.logger.warn({ msg: `Schema push warnings: ${warnings.join(', ')}` })
+  }
+  await apply()
+}
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -191,10 +212,12 @@ export default buildConfig({
         return uri || `file:${path.resolve(dirname, './ejada.db')}`
       })(),
     },
-    // push: true applies the schema directly to the DB on every cold start.
-    // This avoids the need for committed migration files and works well with
-    // Vercel's ephemeral /tmp filesystem where the DB is always fresh.
+    // push: true for local dev (NODE_ENV !== 'production').
+    // prodMigrations handles production cold starts via drizzle-kit/api push.
     push: true,
+    prodMigrations: [
+      { name: 'initial', up: initialSchemaMigration, down: async () => {} },
+    ],
   }),
 
   secret: process.env.PAYLOAD_SECRET || 'ejada-cms-secret-dev-key-change-in-production',
