@@ -44,12 +44,20 @@ async function initialSchemaMigration({ payload }: MigrateUpArgs): Promise<void>
         }
         return parts.join(' ')
       })
-      const fks = config.foreignKeys.map((fk: any) => {
-        const cols = fk.reference().columns.map((c: any) => `"${c.name}"`).join(', ')
-        const refTable = getTableConfig(fk.reference().foreignTable)
-        const refCols = fk.reference().foreignColumns.map((c: any) => `"${c.name}"`).join(', ')
-        return `foreign key (${fk.columns.map((c: any) => `"${c.name}"`).join(', ')}) references "${refTable.name}"(${refCols})${fk.onDelete ? ` on delete ${fk.onDelete}` : ''}`
-      })
+      // FK processing in its own try-catch: if it throws, we still create the table
+      // (SQLite doesn't enforce FKs by default, so missing FK clauses are safe)
+      let fks: string[] = []
+      try {
+        fks = config.foreignKeys.map((fk: any) => {
+          const refTable = getTableConfig(fk.reference().foreignTable)
+          const refCols = fk.reference().foreignColumns.map((c: any) => `"${c.name}"`).join(', ')
+          return `foreign key (${fk.columns.map((c: any) => `"${c.name}"`).join(', ')}) references "${refTable.name}"(${refCols})${fk.onDelete ? ` on delete ${fk.onDelete}` : ''}`
+        })
+      } catch (_fkErr) {
+        // FK introspection failed — create table without FK constraints
+        payload.logger.warn({ msg: `[migration] Skipping FK constraints for table "${config.name}"` })
+        fks = []
+      }
       const allParts = [...cols, ...fks]
       statements.push(`create table if not exists "${config.name}" (\n  ${allParts.join(',\n  ')}\n)`)
     } catch (_e) {
