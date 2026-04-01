@@ -185,12 +185,13 @@ export default function Navigation() {
                 </AnimatePresence>
               </div>
 
-              <button
-                className="text-xs font-bold uppercase tracking-widest px-3 py-1.5 border transition-colors duration-200"
+              <a
+                href="/ar"
+                className="text-xs font-bold uppercase tracking-widest px-3 py-1.5 border transition-colors duration-200 hover:opacity-80"
                 style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
               >
-                AR
-              </button>
+                عربي
+              </a>
 
               <MagneticButton href="#contact" variant="primary" strength={0.2}>
                 Get in Touch

@@ -176,7 +176,12 @@ export default buildConfig({
   ],
 
   db: sqliteAdapter({
-    client: { url: process.env.DATABASE_URI || `file:${path.resolve(dirname, './ejada.db')}` },
+    // On Vercel the project root is read-only — use /tmp which is writable.
+    // Locally the file lands next to payload.config.ts as expected.
+    client: {
+      url: process.env.DATABASE_URI
+        || (process.env.VERCEL ? 'file:/tmp/ejada.db' : `file:${path.resolve(dirname, './ejada.db')}`),
+    },
   }),
 
   secret: process.env.PAYLOAD_SECRET || 'ejada-cms-secret-dev-key-change-in-production',
