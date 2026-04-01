@@ -2,23 +2,88 @@ import { buildConfig } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import type { MigrateUpArgs } from '@payloadcms/db-sqlite'
-// Static import so Turbopack includes drizzle-kit/api in the Lambda bundle
-import { pushSQLiteSchema } from 'drizzle-kit/api'
+import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
 /**
- * Production migration: push the full schema on first cold start.
- * Uses drizzle-kit/api directly (statically imported so it's bundled).
- * This runs instead of the dev-only `pushDevSchema` which is gated by NODE_ENV.
+ * Map a Drizzle column's SQLite type to a DDL type string.
+ */
+function columnTypeToDDL(col: any): string {
+  const t = col.columnType as string
+  if (t === 'SQLiteInteger' || t === 'SQLiteBigInt' || t === 'SQLiteBoolean') return 'integer'
+  if (t === 'SQLiteNumeric') return 'numeric'
+  if (t === 'SQLiteReal') return 'real'
+  if (t === 'SQLiteBlob') return 'blob'
+  return 'text' // SQLiteText, SQLiteTimestamp, etc.
+}
+
+/**
+ * Production migration: create all Payload tables using schema introspection.
+ * Uses only drizzle-orm (bundled) — avoids drizzle-kit which has missing deps.
  */
 async function initialSchemaMigration({ payload }: MigrateUpArgs): Promise<void> {
   const adapter = (payload as any).db
-  const { apply, warnings } = await pushSQLiteSchema(adapter.schema, adapter.drizzle)
-  if (warnings.length) {
-    payload.logger.warn({ msg: `Schema push warnings: ${warnings.join(', ')}` })
+  const schema = adapter.schema as Record<string, any>
+
+  const statements: string[] = []
+
+  for (const [, tableOrRelation] of Object.entries(schema)) {
+    // Skip relation objects — they're not tables
+    if (typeof tableOrRelation !== 'object' || !tableOrRelation || !tableOrRelation[Symbol.for('drizzle:IsDrizzleTable')]) continue
+    try {
+      const config = getTableConfig(tableOrRelation)
+      const cols = config.columns.map((c: any) => {
+        const parts = [`"${c.name}"`, columnTypeToDDL(c)]
+        if (c.primary) parts.push('primary key')
+        if (c.notNull && !c.primary) parts.push('not null')
+        if (c.autoIncrement) parts.push('autoincrement')
+        if (c.hasDefault && c.default !== undefined && c.default !== null && typeof c.default !== 'object') {
+          const dflt = typeof c.default === 'string' ? `'${c.default.replace(/'/g, "''")}'` : c.default
+          parts.push(`default ${dflt}`)
+        }
+        return parts.join(' ')
+      })
+      const fks = config.foreignKeys.map((fk: any) => {
+        const cols = fk.reference().columns.map((c: any) => `"${c.name}"`).join(', ')
+        const refTable = getTableConfig(fk.reference().foreignTable)
+        const refCols = fk.reference().foreignColumns.map((c: any) => `"${c.name}"`).join(', ')
+        return `foreign key (${fk.columns.map((c: any) => `"${c.name}"`).join(', ')}) references "${refTable.name}"(${refCols})${fk.onDelete ? ` on delete ${fk.onDelete}` : ''}`
+      })
+      const allParts = [...cols, ...fks]
+      statements.push(`create table if not exists "${config.name}" (\n  ${allParts.join(',\n  ')}\n)`)
+    } catch (_e) {
+      // Skip non-table entries
+    }
   }
-  await apply()
+
+  // Execute all CREATE TABLE statements
+  for (const stmt of statements) {
+    await adapter.execute({ drizzle: adapter.drizzle, raw: stmt })
+  }
+
+  // Create indexes from schema
+  for (const [, tableOrRelation] of Object.entries(schema)) {
+    if (typeof tableOrRelation !== 'object' || !tableOrRelation || !tableOrRelation[Symbol.for('drizzle:IsDrizzleTable')]) continue
+    try {
+      const config = getTableConfig(tableOrRelation)
+      for (const idx of config.indexes) {
+        const idxConfig = idx.config
+        if (!idxConfig) continue
+        const unique = idxConfig.unique ? 'unique ' : ''
+        const colList = idxConfig.columns.map((c: any) => `"${typeof c === 'string' ? c : c.name}"`).join(', ')
+        const idxName = idxConfig.name || `${config.name}_${idxConfig.columns.map((c: any) => typeof c === 'string' ? c : c.name).join('_')}_idx`
+        await adapter.execute({
+          drizzle: adapter.drizzle,
+          raw: `create ${unique}index if not exists "${idxName}" on "${config.name}" (${colList})`
+        })
+      }
+    } catch (_e) {
+      // Skip errors for individual indexes
+    }
+  }
+
+  payload.logger.info({ msg: 'Schema applied via drizzle-orm introspection' })
 }
 
 const filename = fileURLToPath(import.meta.url)
