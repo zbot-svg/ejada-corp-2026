@@ -191,6 +191,10 @@ export default buildConfig({
         return uri || `file:${path.resolve(dirname, './ejada.db')}`
       })(),
     },
+    // push: true applies the schema directly to the DB on every cold start.
+    // This avoids the need for committed migration files and works well with
+    // Vercel's ephemeral /tmp filesystem where the DB is always fresh.
+    push: true,
   }),
 
   secret: process.env.PAYLOAD_SECRET || 'ejada-cms-secret-dev-key-change-in-production',
