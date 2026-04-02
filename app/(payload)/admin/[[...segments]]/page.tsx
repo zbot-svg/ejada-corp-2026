@@ -16,13 +16,22 @@ type Args = {
 export const generateMetadata = async ({ params, searchParams }: Args): Promise<Metadata> => {
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
-  return generatePageMetadata({ config, params: resolvedParams, searchParams: resolvedSearchParams })
+  return generatePageMetadata({
+    config,
+    params: Promise.resolve(resolvedParams) as typeof params,
+    searchParams: Promise.resolve(resolvedSearchParams) as typeof searchParams,
+  })
 }
 
 const Page = async ({ params, searchParams }: Args) => {
   const resolvedParams = await params
   const resolvedSearchParams = await searchParams
-  return RootPage({ config, params: resolvedParams, searchParams: resolvedSearchParams, importMap })
+  return RootPage({
+    config,
+    params: Promise.resolve(resolvedParams) as typeof params,
+    searchParams: Promise.resolve(resolvedSearchParams) as typeof searchParams,
+    importMap,
+  })
 }
 
 export default Page
