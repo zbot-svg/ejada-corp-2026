@@ -2,9 +2,11 @@
 
 import { motion } from 'framer-motion'
 import { MagneticButton } from '@/components/ui/magnetic-button'
-import { pageContent } from '@/lib/content'
+import { useContent, useLocale } from '@/lib/content-context'
 
 export default function Footer() {
+  const pageContent = useContent()
+  const { isRTL } = useLocale()
   const { footer } = pageContent
 
   return (
@@ -37,7 +39,7 @@ export default function Footer() {
             <MagneticButton href="#contact" variant="outline" strength={0.2}
               className="border-white/20 text-white hover:bg-white hover:text-[var(--color-text-primary)]"
             >
-              Get in Touch
+              {pageContent.footer.cta}
             </MagneticButton>
           </div>
 
@@ -83,15 +85,15 @@ export default function Footer() {
             {footer.copyright}
           </p>
           <div className="flex items-center gap-5 text-xs" style={{ color: 'rgba(255,255,255,0.28)' }}>
-            <a href="https://www.ejada.com" className="hover:text-white transition-colors">
-              www.ejada.com
+            <a href={`https://${pageContent.footer.bottomLinks.website}`} dir="ltr" className="hover:text-white transition-colors">
+              {pageContent.footer.bottomLinks.website}
             </a>
             <span>·</span>
-            <a href="mailto:info@ejada.com" className="hover:text-white transition-colors">
-              info@ejada.com
+            <a href={`mailto:${pageContent.footer.bottomLinks.email}`} dir="ltr" className="hover:text-white transition-colors">
+              {pageContent.footer.bottomLinks.email}
             </a>
             <span>·</span>
-            <span>Riyadh, KSA</span>
+            <span>{pageContent.footer.bottomLinks.location}</span>
           </div>
         </div>
       </div>

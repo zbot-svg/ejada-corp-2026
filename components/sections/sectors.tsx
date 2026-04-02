@@ -8,10 +8,10 @@ import { SectorTabs } from '@/components/ui/sector-tabs'
 import { CaseStudyCard } from '@/components/ui/case-study-card'
 import { Parallax } from '@/components/primitives/parallax'
 import { ArrowButton } from '@/components/ui/magnetic-button'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
-function SectorContent({ id }: { id: string }) {
-  const sector = pageContent.sectors.find(s => s.id === id)
+function SectorContent({ id, content }: { id: string; content: ReturnType<typeof useContent> }) {
+  const sector = content.sectors.find(s => s.id === id)
   if (!sector) return null
   const { highlight, caseStudies } = sector
 
@@ -116,7 +116,7 @@ function SectorContent({ id }: { id: string }) {
             className="text-xs font-bold uppercase tracking-widest mb-6"
             style={{ color: 'var(--color-text-muted)' }}
           >
-            Case Studies
+            {content.sectorsSection.caseStudiesLabel}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {caseStudies.map((cs, i) => (
@@ -137,6 +137,8 @@ function SectorContent({ id }: { id: string }) {
 }
 
 export default function Sectors() {
+  const pageContent = useContent()
+
   return (
     <section
       id="sectors"
@@ -148,7 +150,7 @@ export default function Sectors() {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10">
           <div className="max-w-xl">
             <FadeUp delay={0.05}>
-              <SectionLabel>Sectors</SectionLabel>
+              <SectionLabel>{pageContent.sectorsSection.label}</SectionLabel>
             </FadeUp>
             <TextReveal
               by="word" delay={0.1} stagger={0.05}
@@ -159,18 +161,18 @@ export default function Sectors() {
                 color: 'var(--color-text-primary)',
               } as React.CSSProperties}
             >
-              Deep expertise, sector by sector.
+              {pageContent.sectorsSection.headline}
             </TextReveal>
           </div>
           <FadeUp delay={0.3}>
-            <ArrowButton href="#contact">All Sectors</ArrowButton>
+            <ArrowButton href="#contact">{pageContent.sectorsSection.allSectorsLabel}</ArrowButton>
           </FadeUp>
         </div>
 
         {/* Tabs — morphing indicator + directional crossfade */}
         <SectorTabs
           tabs={pageContent.sectors.map(s => ({ id: s.id, label: s.label }))}
-          renderContent={(id) => <SectorContent id={id} />}
+          renderContent={(id) => <SectorContent id={id} content={pageContent} />}
         />
       </div>
     </section>

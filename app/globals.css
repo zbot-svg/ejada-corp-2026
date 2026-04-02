@@ -238,7 +238,8 @@
   text-transform: none !important;
 }
 [dir="rtl"] .tracking-wider,
-[dir="rtl"] .tracking-widest {
+[dir="rtl"] .tracking-widest,
+[dir="rtl"] [class*="tracking-"] {
   letter-spacing: 0 !important;
 }
 /* Font-display / heading utility classes use negative tracking

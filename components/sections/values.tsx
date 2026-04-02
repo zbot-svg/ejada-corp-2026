@@ -3,9 +3,10 @@
 import { motion } from 'framer-motion'
 import { SectionLabel } from '@/components/ui/section-label'
 import { FadeUp, FadeLeft, FadeRight } from '@/components/primitives/fade-up'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
 export default function Values() {
+  const pageContent = useContent()
   const { values } = pageContent
 
   return (

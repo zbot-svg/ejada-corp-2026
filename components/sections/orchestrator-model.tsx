@@ -5,9 +5,10 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { SectionLabel } from '@/components/ui/section-label'
 import { TextReveal } from '@/components/primitives/text-reveal'
 import { FadeUp, Stagger } from '@/components/primitives/fade-up'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
 export default function OrchestratorModel() {
+  const pageContent = useContent()
   const { orchestratorModel } = pageContent
   const sectionRef = useRef<HTMLElement>(null)
 

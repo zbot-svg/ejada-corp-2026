@@ -5,9 +5,10 @@ import { SectionLabel } from '@/components/ui/section-label'
 import { TextReveal } from '@/components/primitives/text-reveal'
 import { Stagger } from '@/components/primitives/fade-up'
 import { MarqueeText } from '@/components/primitives/marquee'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
 export default function WhatWeBelieve() {
+  const pageContent = useContent()
   const { whatWeBelieve } = pageContent
 
   return (

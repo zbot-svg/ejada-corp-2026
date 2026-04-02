@@ -5,9 +5,10 @@ import { TextReveal } from '@/components/primitives/text-reveal'
 import { FadeUp } from '@/components/primitives/fade-up'
 import { CapabilityGrid } from '@/components/ui/capability-tile'
 import { Parallax } from '@/components/primitives/parallax'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
 export default function Capabilities() {
+  const pageContent = useContent()
   const { capabilities } = pageContent
 
   return (

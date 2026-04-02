@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ContentProvider } from '@/lib/content-context'
 import Navigation from '@/components/sections/navigation'
 import Hero from '@/components/sections/hero'
 import WhoWeAre from '@/components/sections/who-we-are'
@@ -20,20 +21,22 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main>
-      <Navigation />
-      <Hero />
-      <WhoWeAre />
-      <WhatWeBelieve />
-      <OrchestratorModel />
-      <Values />
-      <WhatWeEnable />
-      <Capabilities />
-      <Sectors />
-      <ProofPoints />
-      <Partners />
-      <Contact />
-      <Footer />
-    </main>
+    <ContentProvider locale="en">
+      <main>
+        <Navigation />
+        <Hero />
+        <WhoWeAre />
+        <WhatWeBelieve />
+        <OrchestratorModel />
+        <Values />
+        <WhatWeEnable />
+        <Capabilities />
+        <Sectors />
+        <ProofPoints />
+        <Partners />
+        <Contact />
+        <Footer />
+      </main>
+    </ContentProvider>
   )
 }

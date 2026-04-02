@@ -6,9 +6,10 @@ import { FadeUp, FadeRight } from '@/components/primitives/fade-up'
 import { CountUp } from '@/components/primitives/count-up'
 import { Parallax } from '@/components/primitives/parallax'
 import { TextReveal } from '@/components/primitives/text-reveal'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
 export default function WhoWeAre() {
+  const pageContent = useContent()
   const { whoWeAre, footprint } = pageContent
 
   return (

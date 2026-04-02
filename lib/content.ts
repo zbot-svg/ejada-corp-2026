@@ -80,15 +80,27 @@ export const pageContent = {
       { label: 'Insights', href: '#insights' },
       { label: 'Contact', href: '#contact' },
     ],
+    cta: 'Get in Touch',
+    langSwitch: 'عربي',
+    langHref: '/ar',
   },
 
   hero: {
     eyebrow: 'Corporate Profile — 2026',
     headline: 'Architects of\nCoherence.',
     tagline: 'Custodians of Trust.',
+    location: 'Riyadh · Kingdom of Saudi Arabia',
+    cta1: 'Explore Capabilities',
+    cta2: 'Start a Project',
+    stats: [
+      { value: '20+', label: 'Years' },
+      { value: '500+', label: 'Projects' },
+      { value: '1K+', label: 'Professionals' },
+      { value: '7', label: 'Countries' },
+    ],
+    scrollLabel: 'Scroll',
     year: '2026',
     website: 'www.ejada.com',
-    // image added from uploaded assets
   },
 
   whoWeAre: {
@@ -349,6 +361,13 @@ export const pageContent = {
     ],
   },
 
+  sectorsSection: {
+    label: 'Sectors',
+    headline: 'Deep expertise, sector by sector.',
+    caseStudiesLabel: 'Case Studies',
+    allSectorsLabel: 'All Sectors',
+  },
+
   sectors: [
     {
       id: 'financial-services',
@@ -565,11 +584,28 @@ export const pageContent = {
     email: 'info@ejada.com',
     phone: '+966 11 000 0000',
     website: 'www.ejada.com',
+    sectorOptions: [
+      'Financial Services', 'Government & Public Sector', 'Healthcare',
+      'Transportation', 'Retail & Consumer', 'Energy & Utilities', 'Real Estate',
+    ],
+    formLabels: {
+      name: 'Full Name', company: 'Company', email: 'Email Address',
+      phone: 'Phone (optional)', sector: 'Select Sector',
+      message: 'Tell us about your project...',
+    },
+    contactLabels: { address: 'Address', email: 'Email', phone: 'Phone' },
+    submit: 'Send Message',
+    submitting: 'Sending...',
+    success: { title: 'Message received.', body: 'We\'ll be in touch within one business day.' },
+    marqueeItems: ['LET\'S BUILD', '·', 'GET IN TOUCH', '·', 'START A PROJECT', '·'],
   },
+
+  proofPointsMarquee: ['20 YEARS', '·', '500+ PROJECTS', '·', '7 COUNTRIES', '·', '50+ CLIENTS', '·'],
 
   footer: {
     brand: 'Ejada Systems',
     tagline: 'The Kingdom\'s National Transformation Orchestrator.',
+    cta: 'Get in Touch',
     links: [
       { heading: 'Company', items: ['About', 'Capabilities', 'Sectors', 'Careers'] },
       { heading: 'Services', items: ['Cloud & AI', 'Enterprise Apps', 'Cybersecurity', 'Managed Services'] },
@@ -577,5 +613,6 @@ export const pageContent = {
       { heading: 'Connect', items: ['Contact', 'Partners', 'Legal', 'Privacy'] },
     ],
     copyright: `© ${new Date().getFullYear()} Ejada Systems. All rights reserved.`,
+    bottomLinks: { website: 'www.ejada.com', email: 'info@ejada.com', location: 'Riyadh, KSA' },
   },
 }

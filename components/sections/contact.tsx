@@ -7,14 +7,11 @@ import { TextReveal } from '@/components/primitives/text-reveal'
 import { FadeUp, FadeRight } from '@/components/primitives/fade-up'
 import { MagneticButton } from '@/components/ui/magnetic-button'
 import { MarqueeText } from '@/components/primitives/marquee'
-import { pageContent } from '@/lib/content'
-
-const sectors = [
-  'Financial Services', 'Government & Public Sector', 'Healthcare',
-  'Transportation', 'Retail & Consumer', 'Energy & Utilities', 'Real Estate',
-]
+import { useContent, useLocale } from '@/lib/content-context'
 
 export default function Contact() {
+  const pageContent = useContent()
+  const { isRTL } = useLocale()
   const { contact } = pageContent
   const [form, setForm] = useState({ name: '', company: '', email: '', phone: '', sector: '', message: '' })
   const [loading, setLoading] = useState(false)
@@ -41,7 +38,7 @@ export default function Contact() {
       {/* Ambient marquee */}
       <div className="absolute bottom-0 left-0 right-0 pointer-events-none overflow-hidden select-none">
         <MarqueeText
-          items={["LET'S BUILD", '·', 'GET IN TOUCH', '·', 'START A PROJECT', '·']}
+          items={pageContent.contact.marqueeItems}
           speed={40}
           className="opacity-[0.05]"
           textClassName="text-[clamp(40px,7vw,90px)] font-black text-white whitespace-nowrap"
@@ -61,7 +58,7 @@ export default function Contact() {
 
           {/* Left — copy */}
           <div>
-            <SectionLabel light>Get in Touch</SectionLabel>
+            <SectionLabel light>{pageContent.contact.label}</SectionLabel>
             <TextReveal
               by="word" delay={0.1} stagger={0.06}
               className="font-black leading-tight tracking-tight text-white mb-6"
@@ -82,9 +79,9 @@ export default function Contact() {
             <FadeUp delay={0.5}>
               <div className="space-y-5">
                 {[
-                  { label: 'Address', value: contact.address },
-                  { label: 'Email', value: contact.email },
-                  { label: 'Phone', value: contact.phone },
+                  { label: pageContent.contact.contactLabels.address, value: contact.address },
+                  { label: pageContent.contact.contactLabels.email, value: contact.email },
+                  { label: pageContent.contact.contactLabels.phone, value: contact.phone },
                 ].map(item => (
                   <div key={item.label} className="flex gap-4">
                     <div className="w-16 text-xs font-bold uppercase tracking-widest pt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
@@ -115,9 +112,9 @@ export default function Contact() {
                       <path d="M5 14l7 7 11-11" stroke="#001081" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-black text-white mb-2">Message received.</h3>
+                  <h3 className="text-2xl font-black text-white mb-2">{pageContent.contact.success.title}</h3>
                   <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    We'll be in touch within one business day.
+                    {pageContent.contact.success.body}
                   </p>
                 </motion.div>
               ) : (
@@ -128,8 +125,8 @@ export default function Contact() {
                 >
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { name: 'name', label: 'Full Name', type: 'text' },
-                      { name: 'company', label: 'Company', type: 'text' },
+                      { name: 'name', label: pageContent.contact.formLabels.name, type: 'text' },
+                      { name: 'company', label: pageContent.contact.formLabels.company, type: 'text' },
                     ].map(field => (
                       <div key={field.name} className="relative">
                         <input
@@ -148,8 +145,8 @@ export default function Contact() {
 
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { name: 'email', label: 'Email Address', type: 'email' },
-                      { name: 'phone', label: 'Phone (optional)', type: 'tel' },
+                      { name: 'email', label: pageContent.contact.formLabels.email, type: 'email' },
+                      { name: 'phone', label: pageContent.contact.formLabels.phone, type: 'tel' },
                     ].map(field => (
                       <div key={field.name} className="relative">
                         <input
@@ -159,6 +156,7 @@ export default function Contact() {
                           onChange={handleChange}
                           placeholder={field.label}
                           required={field.name === 'email'}
+                          dir="ltr"
                           className="w-full bg-transparent border-b px-0 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors duration-200 focus:border-white/60"
                           style={{ borderColor: 'rgba(255,255,255,0.2)' }}
                         />
@@ -176,8 +174,8 @@ export default function Contact() {
                       color: form.sector ? 'white' : 'rgba(255,255,255,0.3)',
                     }}
                   >
-                    <option value="" disabled style={{ background: '#001081' }}>Select Sector</option>
-                    {sectors.map(s => (
+                    <option value="" disabled style={{ background: '#001081' }}>{pageContent.contact.formLabels.sector}</option>
+                    {pageContent.contact.sectorOptions.map(s => (
                       <option key={s} value={s} style={{ background: '#001081' }}>{s}</option>
                     ))}
                   </select>
@@ -186,7 +184,7 @@ export default function Contact() {
                     name="message"
                     value={form.message}
                     onChange={handleChange}
-                    placeholder="Tell us about your project..."
+                    placeholder={pageContent.contact.formLabels.message}
                     rows={4}
                     required
                     className="w-full bg-transparent border-b px-0 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors duration-200 resize-none focus:border-white/60"
@@ -206,10 +204,10 @@ export default function Contact() {
                           animate={{ rotate: 360 }}
                           transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                         />
-                        Sending...
+                        {pageContent.contact.submitting}
                       </span>
                     ) : (
-                      'Send Message'
+                      pageContent.contact.submit
                     )}
                   </MagneticButton>
                 </motion.form>

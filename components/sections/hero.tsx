@@ -8,12 +8,14 @@ import { TextReveal, RevealLine } from '@/components/primitives/text-reveal'
 import { FadeUp } from '@/components/primitives/fade-up'
 import { Parallax } from '@/components/primitives/parallax'
 import { MagneticButton, ArrowButton } from '@/components/ui/magnetic-button'
-import { pageContent } from '@/lib/content'
+import { useContent, useLocale } from '@/lib/content-context'
 
 gsap.registerPlugin(ScrollTrigger)
 
 export default function Hero() {
+  const pageContent = useContent()
   const { hero } = pageContent
+  const { isRTL } = useLocale()
   const [loaded, setLoaded] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
@@ -39,10 +41,10 @@ export default function Hero() {
       className="relative overflow-hidden"
       style={{ minHeight: '100svh', backgroundColor: 'var(--color-bg)' }}
     >
-      {/* ── Parallax image layer (right 55%) ─────────────────────── */}
+      {/* ── Parallax image layer (right 55% or left for RTL) ─────────────────────── */}
       <motion.div
         ref={imageRef}
-        className="absolute inset-y-0 right-0 w-full lg:w-[58%]"
+        className={`absolute inset-y-0 w-full lg:w-[58%] ${isRTL ? 'left-0' : 'right-0'}`}
         style={{ y: imageY }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,11 +55,13 @@ export default function Hero() {
           style={{ objectPosition: 'center 30%' }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
         />
-        {/* Gradient masks — left blend + bottom fade */}
+        {/* Gradient masks — left blend + bottom fade (flipped for RTL) */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to right, var(--color-bg) 0%, var(--color-bg) 5%, transparent 40%)',
+            background: isRTL
+              ? 'linear-gradient(to left, var(--color-bg) 0%, var(--color-bg) 5%, transparent 40%)'
+              : 'linear-gradient(to right, var(--color-bg) 0%, var(--color-bg) 5%, transparent 40%)',
           }}
         />
         <div
@@ -87,7 +91,7 @@ export default function Hero() {
           <div className="flex items-center gap-3">
             <div className="h-px w-8" style={{ backgroundColor: 'var(--color-accent)' }} />
             <span
-              className="text-[10px] font-bold uppercase tracking-[0.22em]"
+              className={isRTL ? 'text-[10px] font-bold' : 'text-[10px] font-bold uppercase tracking-[0.22em]'}
               style={{ color: 'var(--color-accent)' }}
             >
               {hero.eyebrow}
@@ -133,7 +137,7 @@ export default function Hero() {
                   className="text-sm"
                   style={{ color: 'var(--color-text-muted)' }}
                 >
-                  Riyadh · Kingdom of Saudi Arabia
+                  {hero.location}
                 </p>
               </div>
             </div>
@@ -143,10 +147,10 @@ export default function Hero() {
           <FadeUp delay={1.1}>
             <div className="flex flex-wrap items-center gap-4">
               <MagneticButton href="#capabilities" variant="primary">
-                Explore Capabilities
+                {hero.cta1}
               </MagneticButton>
               <ArrowButton href="#contact">
-                Start a Project
+                {hero.cta2}
               </ArrowButton>
             </div>
           </FadeUp>
@@ -158,12 +162,7 @@ export default function Hero() {
             className="flex flex-wrap gap-8 pt-8"
             style={{ borderTop: '1px solid var(--color-border)' }}
           >
-            {[
-              { value: '20+', label: 'Years' },
-              { value: '500+', label: 'Projects' },
-              { value: '1K+', label: 'Professionals' },
-              { value: '7', label: 'Countries' },
-            ].map((stat) => (
+            {hero.stats.map((stat) => (
               <div key={stat.label}>
                 <div
                   className="text-2xl font-black tracking-tight"
@@ -172,7 +171,7 @@ export default function Hero() {
                   {stat.value}
                 </div>
                 <div
-                  className="text-[10px] font-semibold uppercase tracking-widest mt-0.5"
+                  className={isRTL ? 'text-[10px] font-semibold mt-0.5' : 'text-[10px] font-semibold uppercase tracking-widest mt-0.5'}
                   style={{ color: 'var(--color-text-muted)' }}
                 >
                   {stat.label}
@@ -185,7 +184,7 @@ export default function Hero() {
 
       {/* ── Scroll indicator ─────────────────────────────────────────── */}
       <motion.div
-        className="absolute bottom-8 right-8 hidden lg:flex flex-col items-center gap-2"
+        className={`absolute bottom-8 hidden lg:flex flex-col items-center gap-2 ${isRTL ? 'left-8' : 'right-8'}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: loaded ? 1 : 0 }}
         transition={{ delay: 1.8 }}
@@ -194,7 +193,7 @@ export default function Hero() {
           className="text-[9px] font-bold uppercase tracking-[0.25em]"
           style={{ color: 'var(--color-text-muted)', writingMode: 'vertical-rl' }}
         >
-          Scroll
+          {hero.scrollLabel}
         </span>
         <motion.div
           className="w-px h-12"

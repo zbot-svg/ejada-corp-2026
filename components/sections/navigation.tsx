@@ -4,15 +4,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { MagneticButton } from '@/components/ui/magnetic-button'
 import { useTheme } from '@/components/providers/theme-provider'
+import { useContent, useLocale } from '@/lib/content-context'
 import type { Theme } from '@/components/providers/theme-provider'
-
-const navLinks = [
-  { label: 'About', href: '#about' },
-  { label: 'Capabilities', href: '#capabilities' },
-  { label: 'Sectors', href: '#sectors' },
-  { label: 'Insights', href: '#insights' },
-  { label: 'Contact', href: '#contact' },
-]
 
 const themeOptions: { id: Theme; label: string }[] = [
   { id: 'light', label: 'Light' },
@@ -32,6 +25,8 @@ export default function Navigation() {
   const [activeSection, setActiveSection] = useState('')
   const [themeOpen, setThemeOpen] = useState(false)
   const { theme, setTheme } = useTheme()
+  const pageContent = useContent()
+  const { isRTL } = useLocale()
 
   const { scrollYProgress } = useScroll()
   const navOpacity = useTransform(scrollYProgress, [0, 0.04], [0, 1])
@@ -43,7 +38,7 @@ export default function Navigation() {
   }, [])
 
   useEffect(() => {
-    const sectionIds = navLinks.map(l => l.href.replace('#', ''))
+    const sectionIds = pageContent.nav.links.map(l => l.href.replace('#', ''))
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -57,7 +52,7 @@ export default function Navigation() {
       if (el) observer.observe(el)
     })
     return () => observer.disconnect()
-  }, [])
+  }, [pageContent.nav.links])
 
   useEffect(() => {
     const onResize = () => { if (window.innerWidth >= 1024) setMenuOpen(false) }
@@ -107,7 +102,7 @@ export default function Navigation() {
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-1">
-              {navLinks.map((link) => {
+              {pageContent.nav.links.map((link) => {
                 const isActive = activeSection === link.href.replace('#', '')
                 return (
                   <a
@@ -186,15 +181,15 @@ export default function Navigation() {
               </div>
 
               <a
-                href="/ar"
+                href={pageContent.nav.langHref}
                 className="text-xs font-bold uppercase tracking-widest px-3 py-1.5 border transition-colors duration-200 hover:opacity-80"
                 style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
               >
-                عربي
+                {pageContent.nav.langSwitch}
               </a>
 
               <MagneticButton href="#contact" variant="primary" strength={0.2}>
-                Get in Touch
+                {pageContent.nav.cta}
               </MagneticButton>
             </div>
 
@@ -238,13 +233,13 @@ export default function Navigation() {
             transition={{ type: 'spring', stiffness: 80, damping: 20 }}
           >
             <nav className="flex flex-col gap-2">
-              {navLinks.map((link, i) => (
+              {pageContent.nav.links.map((link, i) => (
                 <motion.a
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
                   className="text-3xl font-black tracking-tight text-white hover:opacity-70 transition-opacity py-2"
-                  initial={{ opacity: 0, x: -30 }}
+                  initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.06 + 0.1, type: 'spring', stiffness: 100, damping: 20 }}
                 >
@@ -266,7 +261,7 @@ export default function Navigation() {
                 className="inline-flex items-center justify-center px-6 py-3.5 font-bold text-sm uppercase tracking-widest text-white"
                 style={{ backgroundColor: 'var(--color-accent)' }}
               >
-                Get in Touch
+                {pageContent.nav.cta}
               </a>
             </motion.div>
           </motion.div>

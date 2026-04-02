@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, ReactNode } from 'react'
+import { useRef, useEffect, useState, ReactNode } from 'react'
 import { motion, useInView, Variants } from 'framer-motion'
 
 /**
@@ -86,6 +86,12 @@ export function TextReveal({
   const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref as React.RefObject<Element>, { once, amount: threshold })
 
+  // Detect RTL to avoid overflow-hidden clipping Arabic descenders
+  const [isRTL, setIsRTL] = useState(false)
+  useEffect(() => {
+    setIsRTL(document.documentElement.dir === 'rtl')
+  }, [])
+
   // Convert children to string if needed
   const text = typeof children === 'string' ? children : ''
 
@@ -131,7 +137,7 @@ export function TextReveal({
         return (
           <span
             key={i}
-            className="inline-block overflow-hidden"
+            className={`inline-block ${isRTL ? '' : 'overflow-hidden'}`}
             style={{ perspective: '1000px' }}
           >
             <motion.span

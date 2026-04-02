@@ -5,9 +5,10 @@ import { SectionLabel } from '@/components/ui/section-label'
 import { TextReveal } from '@/components/primitives/text-reveal'
 import { CountUpRow } from '@/components/primitives/count-up'
 import { MarqueeText } from '@/components/primitives/marquee'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
 export default function ProofPoints() {
+  const pageContent = useContent()
   const { proofPoints } = pageContent
 
   return (
@@ -18,7 +19,7 @@ export default function ProofPoints() {
       {/* Ambient marquee backdrop */}
       <div className="absolute inset-0 flex items-center pointer-events-none overflow-hidden select-none">
         <MarqueeText
-          items={['20 YEARS', '·', '500+ PROJECTS', '·', '7 COUNTRIES', '·', '50+ CLIENTS', '·']}
+          items={pageContent.proofPointsMarquee}
           speed={50}
           className="opacity-[0.05]"
           textClassName="text-[clamp(48px,8vw,100px)] font-black text-white whitespace-nowrap"

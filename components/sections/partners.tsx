@@ -5,9 +5,10 @@ import { TextReveal } from '@/components/primitives/text-reveal'
 import { FadeUp } from '@/components/primitives/fade-up'
 import { Marquee } from '@/components/primitives/marquee'
 import { PartnerGrid } from '@/components/ui/partner-logo'
-import { pageContent } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 
 export default function Partners() {
+  const pageContent = useContent()
   const { partners } = pageContent
 
   return (
