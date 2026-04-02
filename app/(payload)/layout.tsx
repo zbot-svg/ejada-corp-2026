@@ -13,7 +13,7 @@ import React from 'react'
 import config from '@payload-config'
 import { getPayload } from 'payload'
 import { initI18n } from '@payloadcms/translations'
-import { ConfigProvider } from '@payloadcms/ui/providers/Config'
+import { ConfigProvider } from '@payloadcms/ui'
 import { getClientConfig } from '@payloadcms/ui/utilities/getClientConfig'
 import { importMap } from './admin/importMap'
 
