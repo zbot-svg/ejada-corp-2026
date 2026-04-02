@@ -8,7 +8,7 @@
  * than imported from @payloadcms/next/dist/... internal paths — Turbopack
  * can only resolve packages through their declared `exports` map.
  */
-import { initI18n, rtlLanguages } from '@payloadcms/translations'
+import { initI18n } from '@payloadcms/translations'
 import { RootProvider, defaultTheme } from '@payloadcms/ui'
 import { getClientConfig } from '@payloadcms/ui/utilities/getClientConfig'
 import { cookies as nextCookies, headers as getHeaders } from 'next/headers'
@@ -130,8 +130,6 @@ export default async function PayloadAdminLayout({
 
   // ── Build client config ───────────────────────────────────────────────────
   const theme = getRequestTheme({ config: resolvedConfig, cookies, headers })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(rtlLanguages as any[]).includes(languageCode) // precompute RTL (unused here; html dir set by root layout)
 
   const languageOptions = Object.entries(resolvedConfig.i18n.supportedLanguages || {}).reduce(
     (acc: { label: string; value: string }[], [language, languageConfig]: [string, unknown]) => {
