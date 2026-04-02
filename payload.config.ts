@@ -139,8 +139,17 @@ export default buildConfig({
       title:       'Ejada CMS',
       description: 'Ejada Systems content management',
     },
+    importMap: {
+      baseDir: path.resolve(dirname),
+    },
     components: {
-      // Custom logo/icon can be swapped in here later
+      graphics: {
+        Logo: '/components/admin/Logo#Logo',
+        Icon: '/components/admin/Icon#Icon',
+      },
+      beforeLogin: ['/components/admin/BeforeLogin#BeforeLogin'],
+      beforeDashboard: ['/components/admin/DashboardBanner#DashboardBanner'],
+      afterNavLinks: ['/components/admin/NavFooter#NavFooter'],
     },
   },
 

@@ -1,0 +1,237 @@
+/* ─── Ejada CMS Admin — Custom Branding ─────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Theme overrides ──────────────────────────────────────────────────── */
+:root {
+  --font-body:    'Readex Pro', system-ui, sans-serif;
+  --font-mono:    'SF Mono', 'Fira Code', monospace;
+
+  /* Brand navy tones */
+  --theme-elevation-0:  #F5F1EB;
+  --theme-elevation-1:  #FFFFFF;
+  --theme-elevation-2:  #FAFAF8;
+  --theme-elevation-3:  #F0ECE4;
+
+  --theme-input-bg:     #FFFFFF;
+  --theme-bg:           #F5F1EB;
+
+  --theme-text:         #001081;
+  --theme-color-gray-50: #F5F1EB;
+  --theme-color-gray-100: #EEE9E0;
+
+  /* Accent colors */
+  --theme-success-500:  #1FED93;
+  --theme-error-500:    #E74C3C;
+  --theme-warning-500:  #F39C12;
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] {
+  --theme-elevation-0:  #000820;
+  --theme-elevation-1:  #001050;
+  --theme-elevation-2:  #001470;
+  --theme-elevation-3:  #001890;
+
+  --theme-input-bg:     #001050;
+  --theme-bg:           #000820;
+
+  --theme-text:         #EEE9E0;
+}
+
+/* ── Font override ────────────────────────────────────────────────────── */
+body {
+  font-family: 'Readex Pro', system-ui, sans-serif !important;
+}
+
+/* ── Login / Create-first-user page ───────────────────────────────────── */
+.login,
+[class*="loginPage"],
+.payload-default .template-default--no-nav {
+  background: linear-gradient(135deg, #000820 0%, #001081 50%, #0018A0 100%) !important;
+  min-height: 100vh;
+}
+
+/* The login form card */
+.login .card,
+.login form,
+[class*="loginForm"],
+.template-default--no-nav .card {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Login page text */
+.login h1,
+.login h2,
+.login label,
+.login p,
+.template-default--no-nav h1,
+.template-default--no-nav h2,
+.template-default--no-nav label,
+.template-default--no-nav p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Login inputs */
+.login input,
+.template-default--no-nav input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFFFFF !important;
+  border-radius: 8px !important;
+}
+
+.login input:focus,
+.template-default--no-nav input:focus {
+  border-color: #0070C0 !important;
+  box-shadow: 0 0 0 3px rgba(0, 112, 192, 0.25) !important;
+}
+
+.login input::placeholder,
+.template-default--no-nav input::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Login button */
+.login button[type="submit"],
+.template-default--no-nav button[type="submit"] {
+  background: #0070C0 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+  padding: 12px 24px !important;
+  transition: all 0.2s ease !important;
+}
+
+.login button[type="submit"]:hover,
+.template-default--no-nav button[type="submit"]:hover {
+  background: #005CA0 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 112, 192, 0.4) !important;
+}
+
+/* Login links */
+.login a,
+.template-default--no-nav a {
+  color: #0070C0 !important;
+}
+
+/* Muted helper text on login */
+.login .field-description,
+.template-default--no-nav .field-description {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Select / dropdown on create-first-user */
+.login .rs__control,
+.template-default--no-nav .rs__control,
+.login [class*="ReactSelect"],
+.template-default--no-nav [class*="ReactSelect"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.login .rs__single-value,
+.template-default--no-nav .rs__single-value {
+  color: #FFFFFF !important;
+}
+
+/* ── Sidebar / Nav ────────────────────────────────────────────────────── */
+.nav {
+  border-right-color: var(--theme-color-gray-100) !important;
+}
+
+/* Nav group headings */
+.nav-group__label {
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-size: 10px !important;
+  color: var(--theme-text) !important;
+  opacity: 0.5;
+}
+
+/* Active nav item */
+.nav-group .active {
+  background: rgba(0, 112, 192, 0.08) !important;
+  color: #0070C0 !important;
+  font-weight: 600 !important;
+  border-radius: 6px;
+}
+
+/* ── Dashboard ────────────────────────────────────────────────────────── */
+.dashboard__wrap {
+  max-width: 1200px;
+}
+
+.dashboard__card-list .card {
+  border-radius: 8px !important;
+  border: 1px solid var(--theme-color-gray-100) !important;
+  transition: all 0.2s ease;
+}
+
+.dashboard__card-list .card:hover {
+  border-color: #0070C0 !important;
+  box-shadow: 0 4px 16px rgba(0, 16, 129, 0.08) !important;
+  transform: translateY(-2px);
+}
+
+/* ── Document header ──────────────────────────────────────────────────── */
+.doc-header {
+  border-bottom: 2px solid var(--theme-color-gray-100) !important;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn {
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn--style-primary {
+  background: #001081 !important;
+}
+
+.btn--style-primary:hover {
+  background: #0018A0 !important;
+}
+
+/* ── Table styles ─────────────────────────────────────────────────────── */
+.table th {
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-size: 11px !important;
+}
+
+/* ── Status pills ─────────────────────────────────────────────────────── */
+.pill {
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  font-size: 11px !important;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 16, 129, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 16, 129, 0.3);
+}
