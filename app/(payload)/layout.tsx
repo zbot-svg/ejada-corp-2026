@@ -130,7 +130,8 @@ export default async function PayloadAdminLayout({
 
   // ── Build client config ───────────────────────────────────────────────────
   const theme = getRequestTheme({ config: resolvedConfig, cookies, headers })
-  const dir = rtlLanguages.includes(languageCode) ? 'RTL' : 'LTR'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(rtlLanguages as any[]).includes(languageCode) // precompute RTL (unused here; html dir set by root layout)
 
   const languageOptions = Object.entries(resolvedConfig.i18n.supportedLanguages || {}).reduce(
     (acc: { label: string; value: string }[], [language, languageConfig]: [string, unknown]) => {
@@ -162,8 +163,6 @@ export default async function PayloadAdminLayout({
   })
 
   await applyLocaleFiltering({ clientConfig, config: resolvedConfig, req })
-
-  void dir // suppress unused-var lint for dir (used via RootProvider data-dir attribute internally)
 
   return (
     <RootProvider
