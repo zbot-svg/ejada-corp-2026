@@ -13,7 +13,6 @@ import { RootProvider, defaultTheme } from '@payloadcms/ui'
 import { getClientConfig } from '@payloadcms/ui/utilities/getClientConfig'
 import { cookies as nextCookies, headers as getHeaders } from 'next/headers'
 import {
-  applyLocaleFiltering,
   createLocalReq,
   executeAuthStrategies,
   getAccessResults,
@@ -21,7 +20,7 @@ import {
   getRequestLanguage,
   parseCookies,
 } from 'payload'
-import { PREFERENCE_KEYS } from 'payload/shared'
+import { PREFERENCE_KEYS, applyLocaleFiltering } from 'payload/shared'
 import React from 'react'
 
 import { handleServerFunctions } from '@payloadcms/next/layouts'
