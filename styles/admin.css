@@ -400,6 +400,16 @@ body {
   transform: translateY(-2px);
 }
 
+/* ── Dashboard header cleanup ─────────────────────────────────────────── */
+/* Payload renders its own dashboard heading — hide since DashboardBanner replaces it */
+.dashboard__wrap > header {
+  display: none !important;
+}
+/* Hide duplicate locale selectors on the dashboard */
+.dashboard__wrap > .render-locale-selector {
+  display: none !important;
+}
+
 /* ── Document header ──────────────────────────────────────────────────── */
 .doc-header {
   border-bottom: 2px solid var(--theme-color-gray-100) !important;

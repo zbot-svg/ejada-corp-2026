@@ -123,6 +123,15 @@ function useAdminStyleFix() {
         box-shadow: 0 4px 16px rgba(0, 16, 129, 0.08) !important;
         transform: translateY(-2px) !important;
       }
+      /* ── Dashboard header cleanup ── */
+      /* Payload renders its own dashboard heading — hide it since DashboardBanner replaces it */
+      .dashboard__wrap > header {
+        display: none !important;
+      }
+      /* Hide duplicate locale selectors on the dashboard */
+      .dashboard__wrap > .render-locale-selector {
+        display: none !important;
+      }
     `
     document.head.appendChild(style)
   }, [])
