@@ -198,24 +198,28 @@ export default buildConfig({
   ],
 
   // ── Database ─────────────────────────────────────────────────────────────
+  // Supports three modes:
+  //   1. Turso (production) — set TURSO_DATABASE_URL + TURSO_AUTH_TOKEN env vars
+  //   2. Local file (dev)   — uses file:./ejada.db by default
+  //   3. Vercel fallback    — /tmp/ejada.db (ephemeral, not recommended)
   db: sqliteAdapter({
-    // On Vercel the project root is read-only — only /tmp is writable.
-    // If DATABASE_URI is a relative file path (e.g. "file:./ejada.db"), rewrite it
-    // to /tmp on Vercel. Otherwise honour whatever DATABASE_URI is set to.
-    client: {
-      url: (() => {
-        const uri = process.env.DATABASE_URI
-        if (process.env.VERCEL) {
-          // Relative file:// URIs can't be written on Vercel's read-only FS
-          if (!uri || uri.startsWith('file:./') || uri.startsWith('file:ejada')) {
-            return 'file:/tmp/ejada.db'
-          }
+    client: (() => {
+      // Turso remote SQLite — persistent across Vercel cold starts
+      const tursoUrl = process.env.TURSO_DATABASE_URL
+      const tursoToken = process.env.TURSO_AUTH_TOKEN
+      if (tursoUrl && tursoToken) {
+        return { url: tursoUrl, authToken: tursoToken }
+      }
+      // Local / fallback
+      const uri = process.env.DATABASE_URI
+      if (process.env.VERCEL) {
+        if (!uri || uri.startsWith('file:./') || uri.startsWith('file:ejada')) {
+          return { url: 'file:/tmp/ejada.db' }
         }
-        return uri || `file:${path.resolve(dirname, './ejada.db')}`
-      })(),
-    },
-    // push: true for local dev (NODE_ENV !== 'production').
-    // prodMigrations handles production cold starts via schema introspection.
+      }
+      return { url: uri || `file:${path.resolve(dirname, './ejada.db')}` }
+    })(),
+    // push: true syncs schema automatically in dev
     push: true,
     prodMigrations: [
       { name: 'initial', up: initialSchemaMigration, down: async () => {} },
