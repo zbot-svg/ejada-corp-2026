@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { CapabilityGrid } from '@/components/ui/capability-tile'
 import { SectorTabs } from '@/components/ui/sector-tabs'
 import { CaseStudyCard } from '@/components/ui/case-study-card'
 import { Marquee, MarqueeText } from '@/components/primitives/marquee'
-import { MagneticButton } from '@/components/ui/magnetic-button'
+import { MagneticButton, ArrowButton } from '@/components/ui/magnetic-button'
 import { Parallax } from '@/components/primitives/parallax'
+import { Stagger } from '@/components/primitives/fade-up'
 
 /* ─── Arabic Content ─────────────────────────────────────────────────
    Translated from lib/content.ts — mirrors every section exactly.
@@ -54,6 +55,20 @@ const AR = {
       { value: '٥٠٠+',  label: 'مشروع منجز' },
       { value: '٢٥+',   label: 'شريك استراتيجي' },
       { value: '٧',     label: 'دول' },
+    ],
+  },
+
+  footprint: {
+    label: 'بصمتنا',
+    headline: 'مقرنا في المملكة العربية السعودية. نُنفِّذ عبر المنطقة.',
+    body: 'تواجد استراتيجي عبر أربع دول، يُمكِّن التنفيذ السلس والخبرة المحلية لمبادرات التحول الإقليمية.',
+    locations: [
+      { city: 'الرياض', country: 'المملكة العربية السعودية', type: 'المقر الرئيسي' },
+      { city: 'جدة', country: 'المملكة العربية السعودية', type: 'مكتب' },
+      { city: 'دبي', country: 'الإمارات', type: 'مركز تنفيذ' },
+      { city: 'القاهرة', country: 'مصر', type: 'مركز تنفيذ' },
+      { city: 'عمّان', country: 'الأردن', type: 'مركز تنفيذ' },
+      { city: 'حيدر أباد', country: 'الهند', type: 'مركز تطوير' },
     ],
   },
 
@@ -549,14 +564,35 @@ function Nav() {
 /* ─── Hero ────────────────────────────────────────────────────────── */
 function Hero() {
   const { hero } = AR
+  const sectionRef = useRef<HTMLElement>(null)
+  const [loaded, setLoaded] = useState(false)
+
+  // Scroll-linked parallax for the image layer
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  })
+  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '12%'])
+  const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 200)
+    return () => clearTimeout(t)
+  }, [])
+
   return (
     <section
+      ref={sectionRef}
       id="hero"
       className="relative overflow-hidden"
       style={{ minHeight: '100svh', backgroundColor: 'var(--color-bg)' }}
     >
-      {/* Image panel — left side for RTL */}
-      <div className="absolute inset-y-0 left-0 w-full lg:w-[58%]">
+      {/* Image panel — left side for RTL with scroll-linked parallax */}
+      <motion.div
+        className="absolute inset-y-0 left-0 w-full lg:w-[58%]"
+        style={{ y: imageY }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/hero-bg.jpg"
@@ -573,7 +609,7 @@ function Hero() {
           className="absolute inset-0"
           style={{ background: 'linear-gradient(to bottom, transparent 40%, var(--color-bg) 100%)' }}
         />
-      </div>
+      </motion.div>
 
       {/* Dot grid */}
       <div
@@ -584,10 +620,10 @@ function Hero() {
         }}
       />
 
-      {/* Content panel — right side in RTL */}
-      <div
+      {/* Content panel — right side in RTL with scroll effects */}
+      <motion.div
         className="relative z-10 flex flex-col justify-between w-full lg:max-w-[52%] ms-auto px-6 lg:px-20 pt-28 pb-10 lg:py-32"
-        style={{ minHeight: '100svh' }}
+        style={{ minHeight: '100svh', opacity }}
       >
         <FadeUp delay={0.3}>
           <div className="flex items-center gap-3">
@@ -598,13 +634,12 @@ function Hero() {
           </div>
         </FadeUp>
 
-        <div>
+        <motion.div style={{ y: contentY }}>
           <FadeUp delay={0.5}>
             <h1
               className="font-black leading-none mb-8 whitespace-pre-line"
               style={{
                 fontSize: 'clamp(52px, 8vw, 108px)',
-                letterSpacing: '-0.02em',
                 color: 'var(--color-text-primary)',
               }}
             >
@@ -631,23 +666,15 @@ function Hero() {
 
           <FadeUp delay={1.0}>
             <div className="flex flex-wrap items-center gap-4">
-              <a
-                href="#capabilities"
-                className="inline-flex items-center gap-2.5 px-8 py-4 font-bold text-sm hover:opacity-90 transition-all duration-200"
-                style={{ backgroundColor: 'var(--color-accent)', color: '#fff' }}
-              >
+              <MagneticButton href="#capabilities" variant="primary">
                 {hero.cta1}
-              </a>
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2.5 px-8 py-4 text-sm font-semibold border hover:opacity-80 transition-all duration-200"
-                style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
-              >
+              </MagneticButton>
+              <ArrowButton href="#contact">
                 {hero.cta2}
-              </a>
+              </ArrowButton>
             </div>
           </FadeUp>
-        </div>
+        </motion.div>
 
         <FadeUp delay={1.3}>
           <div className="flex flex-wrap gap-8 pt-8" style={{ borderTop: '1px solid var(--color-border)' }}>
@@ -659,137 +686,297 @@ function Hero() {
             ))}
           </div>
         </FadeUp>
-      </div>
-    </section>
-  )
-}
+      </motion.div>
 
-/* ─── Who We Are ──────────────────────────────────────────────────── */
-function WhoWeAre() {
-  const { whoWeAre } = AR
-  return (
-    <section id="about" className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg)' }}>
-      <div className="container mx-auto px-6 lg:px-20">
-        <SectionLabel>{whoWeAre.label}</SectionLabel>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <FadeUp>
-            <h2
-              className="font-black leading-tight mb-6"
-              style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
-            >
-              {whoWeAre.headline}
-            </h2>
-            <p className="text-base leading-[1.9] mb-10" style={{ color: 'var(--color-text-secondary)' }}>
-              {whoWeAre.body}
-            </p>
-            <div className="grid grid-cols-2 gap-6">
-              {whoWeAre.stats.map(({ value, label }) => (
-                <div key={label} className="border-s-2 ps-4" style={{ borderColor: 'var(--color-accent)' }}>
-                  <div className="text-3xl font-black" style={{ color: 'var(--color-text-primary)' }}>{value}</div>
-                  <div className="text-xs font-medium mt-1" style={{ color: 'var(--color-text-muted)' }}>{label}</div>
-                </div>
-              ))}
-            </div>
-          </FadeUp>
-          <FadeUp delay={0.2}>
-            <div className="relative h-[420px] overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/about-img.jpg"
-                alt="إجادة سيستمز"
-                className="w-full h-full object-cover"
-                style={{ opacity: 0.85 }}
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-              />
-            </div>
-          </FadeUp>
+      {/* Scroll indicator — bottom-left for RTL */}
+      <motion.div
+        className="absolute bottom-8 start-8 hidden lg:flex flex-col items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: loaded ? 1 : 0 }}
+        transition={{ delay: 1.8 }}
+      >
+        <span
+          className="text-[9px] font-bold"
+          style={{ color: 'var(--color-text-muted)', writingMode: 'vertical-rl' }}
+        >
+          اسحب
+        </span>
+        <motion.div
+          className="w-px h-12"
+          style={{ backgroundColor: 'var(--color-text-muted)' }}
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+      </motion.div>
+
+      {/* Ambient year text — bottom-left for RTL */}
+      <motion.div
+        className="absolute bottom-8 start-8 hidden lg:block"
+        style={{ transform: 'translateX(-120px)' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: loaded ? 0.1 : 0 }}
+        transition={{ delay: 2 }}
+      >
+        <div
+          className="text-[200px] font-black leading-none whitespace-nowrap"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          ٢٠٢٦
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }
 
-/* ─── What We Believe ────────────────────────────────────────────── */
+/* ─── Who We Are & Footprint ──────────────────────────────────────── */
+function WhoWeAre() {
+  const { whoWeAre, footprint } = AR
+  return (
+    <>
+      {/* Who We Are section */}
+      <section id="about" className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="container mx-auto px-6 lg:px-20">
+          <SectionLabel>{whoWeAre.label}</SectionLabel>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <FadeUp>
+              <h2
+                className="font-black leading-tight mb-6"
+                style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
+              >
+                {whoWeAre.headline}
+              </h2>
+              <p className="text-base leading-[1.9] mb-10" style={{ color: 'var(--color-text-secondary)' }}>
+                {whoWeAre.body}
+              </p>
+              <div className="grid grid-cols-2 gap-6">
+                {whoWeAre.stats.map(({ value, label }) => (
+                  <div key={label} className="border-s-2 ps-4" style={{ borderColor: 'var(--color-accent)' }}>
+                    <div className="text-3xl font-black" style={{ color: 'var(--color-text-primary)' }}>{value}</div>
+                    <div className="text-xs font-medium mt-1" style={{ color: 'var(--color-text-muted)' }}>{label}</div>
+                  </div>
+                ))}
+              </div>
+            </FadeUp>
+
+            <FadeUp delay={0.2}>
+              <div className="relative h-[420px] overflow-hidden">
+                <Parallax speed={0.12}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/about-img.jpg"
+                    alt="إجادة سيستمز"
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                </Parallax>
+
+                {/* Decorative border frame */}
+                <div
+                  className="absolute -bottom-4 -start-4 w-2/3 h-2/3 pointer-events-none -z-10"
+                  style={{ border: '1px solid var(--color-border)' }}
+                />
+
+                {/* Floating accent badge */}
+                <motion.div
+                  className="absolute -bottom-6 -end-6 px-6 py-4 shadow-xl"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
+                  initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.5 }}
+                >
+                  <div className="text-3xl font-black leading-none">٢٠+</div>
+                  <div className="text-xs font-bold mt-1">عاماً في المملكة</div>
+                </motion.div>
+              </div>
+            </FadeUp>
+          </div>
+        </div>
+      </section>
+
+      {/* Footprint section */}
+      <section className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+        <div className="container mx-auto px-6 lg:px-20">
+          <FadeUp>
+            <SectionLabel>{footprint.label}</SectionLabel>
+            <h2
+              className="font-black leading-tight mb-3"
+              style={{ fontSize: 'clamp(24px,3.5vw,40px)', color: 'var(--color-text-primary)' }}
+            >
+              {footprint.headline}
+            </h2>
+            <p className="text-sm leading-relaxed mb-10 max-w-lg" style={{ color: 'var(--color-text-muted)' }}>
+              {footprint.body}
+            </p>
+          </FadeUp>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {footprint.locations.map((loc, i) => (
+              <motion.div
+                key={loc.city}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ type: 'spring', stiffness: 100, damping: 20, delay: i * 0.07 }}
+                className="group p-4 border cursor-default"
+                style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
+                whileHover={{ borderColor: 'var(--color-accent)', y: -2 }}
+              >
+                <div className="text-[9px] font-bold mb-1.5" style={{ color: 'var(--color-accent)' }}>{loc.type}</div>
+                <div className="text-sm font-bold" style={{ color: 'var(--color-text-primary)' }}>{loc.city}</div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{loc.country}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+/* ─── What We Believe ─────────────────────────────────────────────── */
 function WhatWeBelieve() {
   const { whatWeBelieve } = AR
-  return (
-    <section id="story" className="relative overflow-hidden py-24 lg:py-32 bg-[#001081]">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/curved-lines.jpg"
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: 0.06 }}
-        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-      />
-      <div className="container mx-auto px-6 lg:px-20 relative z-10">
-        <SectionLabel light>{whatWeBelieve.label}</SectionLabel>
-        <h2
-          className="font-black leading-tight text-white mb-16 max-w-xl"
-          style={{ fontSize: 'clamp(28px, 4vw, 48px)' }}
-        >
-          {whatWeBelieve.headline}
-        </h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-white/10 mb-16">
-          {whatWeBelieve.beliefs.map((b) => (
-            <FadeUp key={b.number}>
-              <div className="bg-[#001081] p-8 lg:p-10 h-full">
-                <div className="text-xs font-mono text-sky-400 mb-6">{b.number}</div>
-                <h3 className="text-xl font-black text-white mb-4 leading-tight">{b.title}</h3>
-                <p className="text-sm text-white/50 leading-[1.9]">{b.body}</p>
-              </div>
-            </FadeUp>
-          ))}
+  return (
+    <section
+      className="relative overflow-hidden py-28 lg:py-36"
+      style={{ backgroundColor: 'var(--color-text-primary)' }}
+    >
+      {/* Ambient marquee backdrop with Arabic words */}
+      <div className="absolute inset-0 flex flex-col justify-center gap-0 pointer-events-none overflow-hidden select-none">
+        {['الرؤية', 'الرسالة', 'الغاية'].map((word, i) => (
+          <MarqueeText
+            key={word}
+            items={[word, '·', word, '·', word, '·']}
+            speed={60 + i * 15}
+            reverse={i % 2 !== 0}
+            className="opacity-[0.04]"
+            textClassName="text-[clamp(60px,10vw,120px)] font-black text-white whitespace-nowrap"
+          />
+        ))}
+      </div>
+
+      {/* Dot grid */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.06]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+
+      <div className="container mx-auto px-6 lg:px-20 relative z-10">
+        <div className="mb-16">
+          <SectionLabel light>{whatWeBelieve.label}</SectionLabel>
+          <h2
+            className="font-black leading-tight"
+            style={{ fontSize: 'clamp(28px,4vw,52px)', color: 'white' }}
+          >
+            {whatWeBelieve.headline}
+          </h2>
         </div>
 
-        <FadeUp>
-          <div className="max-w-3xl mx-auto text-center">
-            <p className="font-black text-white leading-tight mb-6" style={{ fontSize: 'clamp(20px, 3vw, 36px)' }}>
-              {whatWeBelieve.quote}
-            </p>
-            <p className="text-sm text-white/30">{whatWeBelieve.quoteAttrib}</p>
-          </div>
-        </FadeUp>
+        <Stagger stagger={0.12} direction="up" distance={40} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {whatWeBelieve.beliefs.map((belief) => (
+            <motion.div
+              key={belief.number}
+              className="relative p-8 border group cursor-default"
+              style={{
+                borderColor: 'rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(255,255,255,0.04)',
+              }}
+              whileHover={{
+                borderColor: 'var(--color-accent)',
+                backgroundColor: 'rgba(255,255,255,0.07)',
+                y: -4,
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Left accent bar for RTL context */}
+              <motion.div
+                className="absolute start-0 top-0 bottom-0 w-0.5"
+                style={{ backgroundColor: 'var(--color-accent)' }}
+                initial={{ scaleY: 0 }}
+                whileHover={{ scaleY: 1 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              />
+
+              <div
+                className="text-5xl font-black mb-6 leading-none"
+                style={{ color: 'rgba(255,255,255,0.08)' }}
+              >
+                {belief.number}
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{belief.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                {belief.body}
+              </p>
+            </motion.div>
+          ))}
+        </Stagger>
       </div>
     </section>
   )
 }
 
-/* ─── Orchestrator Model ─────────────────────────────────────────── */
+/* ─── Orchestrator Model ──────────────────────────────────────────── */
 function OrchestratorModel() {
   const { orchestrator } = AR
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, amount: 0.15 })
+
   return (
-    <section className="relative overflow-hidden py-24 lg:py-32 bg-[#000820]">
-      <div className="container mx-auto px-6 lg:px-20">
-        <SectionLabel light>{orchestrator.label}</SectionLabel>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-16">
-          <FadeUp>
-            <h2 className="font-black text-white leading-tight" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
-              {orchestrator.headline}
-            </h2>
-          </FadeUp>
-          <FadeUp delay={0.1}>
-            <p className="text-white/50 text-sm leading-[1.85] lg:pt-3">{orchestrator.body}</p>
-          </FadeUp>
+    <section ref={ref} className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{
+          background: `radial-gradient(circle, var(--color-text-primary) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+
+      <div className="container mx-auto px-6 lg:px-20 relative z-10">
+        <SectionLabel>{orchestrator.label}</SectionLabel>
+        <div className="max-w-2xl mb-16">
+          <h2
+            className="font-black leading-tight mb-4"
+            style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
+          >
+            {orchestrator.headline}
+          </h2>
+          <p className="text-base leading-[1.9]" style={{ color: 'var(--color-text-secondary)' }}>
+            {orchestrator.body}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {orchestrator.steps.map((step, i) => (
-            <FadeUp key={step.number} delay={i * 0.08}>
-              <div className="group">
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="text-xs font-mono text-sky-400/50">{step.number}</span>
-                  <div className="w-14 h-14 bg-white/5 border border-white/10 flex items-center justify-center text-white/40 group-hover:border-sky-400/40 group-hover:text-sky-400 transition-all duration-300">
-                    <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-3 leading-tight">{step.title}</h3>
-                <p className="text-sm text-white/45 leading-[1.85]">{step.description}</p>
+            <motion.div
+              key={step.number}
+              className="p-6 border group"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                borderColor: 'var(--color-border)',
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+              whileHover={{ borderColor: 'var(--color-accent)', y: -4 }}
+            >
+              <div
+                className="text-4xl font-black mb-4 leading-none opacity-10"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
+                {step.number}
               </div>
-            </FadeUp>
+              <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                {step.title}
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                {step.description}
+              </p>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -797,34 +984,48 @@ function OrchestratorModel() {
   )
 }
 
-/* ─── Values ─────────────────────────────────────────────────────── */
+/* ─── Values ──────────────────────────────────────────────────────── */
 function Values() {
   const { values } = AR
+
   return (
-    <section id="values" className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <section className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       <div className="container mx-auto px-6 lg:px-20">
         <SectionLabel>{values.label}</SectionLabel>
-        <h2
-          className="font-black leading-tight mb-4"
-          style={{ fontSize: 'clamp(40px, 6vw, 80px)', color: 'var(--color-text-primary)' }}
-        >
-          {values.acrostic}
-        </h2>
-        <p className="text-sm mb-16 max-w-xl" style={{ color: 'var(--color-text-muted)' }}>
-          {values.subheadline}
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-12 gap-x-6">
-          {values.items.map((v, i) => (
-            <FadeUp key={v.letter} delay={i * 0.06}>
-              <div className="text-center group">
+        <div className="max-w-2xl mb-16">
+          <h2
+            className="font-black leading-tight mb-4"
+            style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
+          >
+            {values.acrostic}
+          </h2>
+          <p className="text-base leading-[1.9]" style={{ color: 'var(--color-text-secondary)' }}>
+            {values.subheadline}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {values.items.map((item) => (
+            <FadeUp key={item.letter}>
+              <div
+                className="p-6 border text-center hover:border-current transition-colors"
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  borderColor: 'var(--color-border)',
+                }}
+              >
                 <div
-                  className="text-5xl lg:text-6xl font-black mb-3 leading-none transition-opacity"
-                  style={{ color: 'var(--color-accent)', opacity: 0.1 }}
+                  className="text-4xl font-black mb-3 leading-none"
+                  style={{ color: 'var(--color-accent)' }}
                 >
-                  {v.letter}
+                  {item.letter}
                 </div>
-                <div className="text-sm font-bold mb-1.5" style={{ color: 'var(--color-text-primary)' }}>{v.title}</div>
-                <div className="text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>{v.description}</div>
+                <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  {item.title}
+                </h3>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                  {item.description}
+                </p>
               </div>
             </FadeUp>
           ))}
@@ -834,33 +1035,42 @@ function Values() {
   )
 }
 
-/* ─── What We Enable ─────────────────────────────────────────────── */
+/* ─── What We Enable ──────────────────────────────────────────────── */
 function WhatWeEnable() {
   const { whatWeEnable } = AR
+
   return (
-    <section id="services" className="relative overflow-hidden py-24 lg:py-32 bg-white">
+    <section className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="container mx-auto px-6 lg:px-20">
         <SectionLabel>{whatWeEnable.label}</SectionLabel>
         <h2
-          className="font-black leading-tight mb-12"
+          className="font-black leading-tight mb-16"
           style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
         >
           {whatWeEnable.headline}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {whatWeEnable.outcomes.map((item, i) => (
-            <FadeUp key={item.number} delay={i * 0.07}>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {whatWeEnable.outcomes.map((outcome, i) => (
+            <FadeUp key={outcome.number} delay={i * 0.08}>
               <div
-                className="border p-8 hover:shadow-lg transition-all duration-300 h-full"
-                style={{ borderColor: 'var(--color-border)' }}
+                className="p-6 border"
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  borderColor: 'var(--color-border)',
+                }}
               >
-                <div className="text-xs font-mono mb-4" style={{ color: 'var(--color-accent)' }}>{item.number}</div>
-                <h3 className="text-base font-bold mb-4 leading-tight" style={{ color: 'var(--color-text-primary)' }}>
-                  {item.title}
+                <div className="text-xs font-bold mb-3" style={{ color: 'var(--color-accent)' }}>
+                  {outcome.number}
+                </div>
+                <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+                  {outcome.title}
                 </h3>
-                <ul className="space-y-1.5">
-                  {item.items.map((it) => (
-                    <li key={it} className="text-xs leading-snug" style={{ color: 'var(--color-text-muted)' }}>{it}</li>
+                <ul className="space-y-2">
+                  {outcome.items.map((item) => (
+                    <li key={item} className="text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                      • {item}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -872,53 +1082,26 @@ function WhatWeEnable() {
   )
 }
 
-/* ─── Capabilities — uses shared CapabilityGrid ───────────────────── */
+/* ─── Capabilities ────────────────────────────────────────────────── */
 function Capabilities() {
   const { capabilities } = AR
-  return (
-    <section
-      id="capabilities"
-      className="relative overflow-hidden py-24 lg:py-32"
-      style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-    >
-      {/* Subtle parallax background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <Parallax speed={0.08} className="w-full h-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/building-02.jpg"
-            alt=""
-            className="w-full h-full object-cover opacity-[0.05]"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-          />
-        </Parallax>
-      </div>
 
-      <div className="container mx-auto px-6 lg:px-10 relative z-10">
-        {/* Header row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-14">
-          <div>
-            <FadeUp delay={0.05}><SectionLabel>{capabilities.label}</SectionLabel></FadeUp>
-            <FadeUp delay={0.1}>
-              <h2
-                className="font-black leading-tight"
-                style={{
-                  fontSize: 'clamp(28px, 4vw, 52px)',
-                  color: 'var(--color-text-primary)',
-                }}
-              >
-                {capabilities.headline}
-              </h2>
-            </FadeUp>
-          </div>
-          <FadeUp delay={0.25}>
-            <p className="text-base leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-              {capabilities.body}
-            </p>
-          </FadeUp>
+  return (
+    <section id="capabilities" className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+      <div className="container mx-auto px-6 lg:px-20">
+        <SectionLabel>{capabilities.label}</SectionLabel>
+        <div className="max-w-2xl mb-16">
+          <h2
+            className="font-black leading-tight mb-4"
+            style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
+          >
+            {capabilities.headline}
+          </h2>
+          <p className="text-base leading-[1.9]" style={{ color: 'var(--color-text-secondary)' }}>
+            {capabilities.body}
+          </p>
         </div>
 
-        {/* Accordion tiles — same component as English */}
         <CapabilityGrid capabilities={capabilities.items} />
       </div>
     </section>
@@ -999,14 +1182,14 @@ function ARSectorContent({ id }: { id: string }) {
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to top, var(--color-text-primary) 0%, transparent 60%)' }}
           />
-          <div className="absolute bottom-6 left-6">
+          <div className="absolute bottom-6" style={{ insetInlineStart: '1.5rem' }}>
             <span className="text-7xl font-black opacity-20 text-white leading-none">
               {sector.label[0]}
             </span>
           </div>
           <motion.div
-            className="absolute top-4 right-4 px-3 py-1.5 text-xs font-bold text-white"
-            style={{ backgroundColor: 'var(--color-accent)' }}
+            className="absolute top-4 px-3 py-1.5 text-xs font-bold text-white"
+            style={{ backgroundColor: 'var(--color-accent)', insetInlineEnd: '1rem' }}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -1040,14 +1223,10 @@ function ARSectorContent({ id }: { id: string }) {
   )
 }
 
-/* ─── Sectors — uses shared SectorTabs ───────────────────────────── */
+/* ─── Sectors ─────────────────────────────────────────────────────── */
 function Sectors() {
   return (
-    <section
-      id="sectors"
-      className="relative overflow-hidden py-24 lg:py-32"
-      style={{ backgroundColor: 'var(--color-bg)' }}
-    >
+    <section id="sectors" className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="container mx-auto px-6 lg:px-10">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-10">
           <div className="max-w-xl">
@@ -1072,97 +1251,82 @@ function Sectors() {
   )
 }
 
-/* ─── Proof Points ───────────────────────────────────────────────── */
+/* ─── Proof Points ────────────────────────────────────────────────── */
 function ProofPoints() {
   const { proofPoints } = AR
+
   return (
-    <section
-      className="relative overflow-hidden py-28 lg:py-36"
-      style={{ backgroundColor: 'var(--color-text-primary)' }}
-    >
-      {/* Ambient marquee backdrop */}
-      <div className="absolute inset-0 flex items-center pointer-events-none overflow-hidden select-none">
-        <MarqueeText
-          items={proofPoints.marqueeItems}
-          speed={50}
-          className="opacity-[0.05]"
-          textClassName="text-[clamp(48px,8vw,100px)] font-black text-white whitespace-nowrap"
-        />
-      </div>
+    <section className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+      <div className="container mx-auto px-6 lg:px-20">
+        <SectionLabel>{proofPoints.label}</SectionLabel>
+        <h2
+          className="font-black leading-tight mb-2"
+          style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
+        >
+          {proofPoints.headline}
+        </h2>
+        <p className="text-sm mb-16" style={{ color: 'var(--color-text-muted)' }}>
+          {proofPoints.subheadline}
+        </p>
 
-      {/* Dot grid */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.07]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
-
-      {/* Radial glow */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 65%)', opacity: 0.08 }}
-      />
-
-      <div className="container mx-auto px-6 lg:px-10 relative z-10">
-        {/* Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-20">
-          <div>
-            <SectionLabel light>{proofPoints.label}</SectionLabel>
-            <FadeUp>
-              <h2
-                className="font-black leading-tight text-white"
-                style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}
-              >
-                {proofPoints.headline}
-              </h2>
-            </FadeUp>
-          </div>
-          <motion.p
-            className="text-sm leading-relaxed max-w-xs"
-            style={{ color: 'rgba(255,255,255,0.45)' }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-          >
-            {proofPoints.subheadline}
-          </motion.p>
+        <div className="mb-16">
+          <MarqueeText
+            items={proofPoints.marqueeItems}
+            speed={50}
+            className="opacity-[0.05]"
+            textClassName="text-[clamp(48px,8vw,100px)] font-black text-[var(--color-text-primary)] whitespace-nowrap"
+          />
         </div>
 
-        {/* Stats with vertical dividers */}
-        <div
-          className="grid grid-cols-2 lg:grid-cols-4 gap-0 border-t border-b"
-          style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-        >
-          {proofPoints.stats.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              className="relative py-10 px-6 lg:px-10"
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ type: 'spring', stiffness: 80, damping: 20, delay: i * 0.1 }}
-            >
-              {i > 0 && (
-                <div
-                  className="absolute start-0 top-6 bottom-6 w-px"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-                />
-              )}
-              <div
-                className="font-black leading-none text-white"
-                style={{ fontSize: 'clamp(48px, 7vw, 80px)', letterSpacing: '-0.03em' }}
-              >
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {proofPoints.stats.map((stat) => (
+            <div key={stat.label}>
+              <div className="text-4xl font-black mb-2" style={{ color: 'var(--color-text-primary)' }}>
                 {stat.value}
               </div>
-              <div
-                className="text-xs font-semibold mt-2"
-                style={{ color: 'rgba(255,255,255,0.4)' }}
-              >
+              <div className="text-xs font-semibold" style={{ color: 'var(--color-text-muted)' }}>
                 {stat.label}
               </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ─── Partners ────────────────────────────────────────────────────── */
+function Partners() {
+  const { partners } = AR
+
+  return (
+    <section className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <div className="container mx-auto px-6 lg:px-20">
+        <SectionLabel>{partners.label}</SectionLabel>
+        <h2
+          className="font-black leading-tight mb-4"
+          style={{ fontSize: 'clamp(24px, 3.5vw, 40px)', color: 'var(--color-text-primary)' }}
+        >
+          {partners.headline}
+        </h2>
+        <p className="text-base leading-relaxed mb-12 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
+          {partners.body}
+        </p>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {partners.list.map((partner) => (
+            <motion.div
+              key={partner}
+              className="p-6 border text-center"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-secondary)',
+              }}
+              whileHover={{ borderColor: 'var(--color-accent)', y: -2 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="text-xs font-bold">{partner}</div>
             </motion.div>
           ))}
         </div>
@@ -1171,407 +1335,253 @@ function ProofPoints() {
   )
 }
 
-/* ─── Partners — uses shared Marquee (two rows) ───────────────────── */
-function Partners() {
-  const { partners } = AR
-  const half = Math.ceil(partners.list.length / 2)
-
-  return (
-    <section
-      className="relative overflow-hidden py-24 lg:py-32"
-      style={{ backgroundColor: 'var(--color-bg-secondary)', borderTop: '1px solid var(--color-border)' }}
-    >
-      <div className="container mx-auto px-6 lg:px-10 mb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-end">
-          <div className="lg:col-span-2">
-            <FadeUp delay={0.05}><SectionLabel>{partners.label}</SectionLabel></FadeUp>
-            <FadeUp delay={0.1}>
-              <h2
-                className="font-black leading-tight"
-                style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
-              >
-                {partners.headline}
-              </h2>
-            </FadeUp>
-          </div>
-          <FadeUp delay={0.25}>
-            <p className="text-base leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-              {partners.body}
-            </p>
-          </FadeUp>
-        </div>
-      </div>
-
-      {/* First marquee strip */}
-      <Marquee speed={35} gap={0} pauseOnHover className="mb-3">
-        {partners.list.slice(0, half).map((name) => (
-          <div
-            key={name}
-            className="flex-shrink-0 px-8 py-5 border-r text-sm font-bold cursor-default transition-colors duration-200"
-            style={{
-              borderColor: 'var(--color-border)',
-              color: 'var(--color-text-muted)',
-              minWidth: 160,
-              textAlign: 'center',
-            }}
-            dir="ltr"
-          >
-            {name.trim()}
-          </div>
-        ))}
-      </Marquee>
-
-      {/* Second marquee strip — reversed */}
-      <Marquee speed={45} reverse gap={0} pauseOnHover>
-        {partners.list.slice(half).map((name) => (
-          <div
-            key={name}
-            className="flex-shrink-0 px-8 py-5 border-r text-sm font-bold cursor-default transition-colors duration-200"
-            style={{
-              borderColor: 'var(--color-border)',
-              color: 'var(--color-text-muted)',
-              minWidth: 160,
-              textAlign: 'center',
-            }}
-            dir="ltr"
-          >
-            {name.trim()}
-          </div>
-        ))}
-      </Marquee>
-    </section>
-  )
-}
-
-/* ─── Contact ────────────────────────────────────────────────────── */
+/* ─── Contact ─────────────────────────────────────────────────────── */
 function Contact() {
   const { contact } = AR
-  const [form, setForm] = useState({ name: '', company: '', email: '', phone: '', sector: '', message: '' })
-  const [loading, setLoading] = useState(false)
-  const [sent, setSent] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const formInView = useInView(formRef, { once: true, amount: 0.1 })
+  const [formState, setFormState] = useState({ name: '', company: '', email: '', phone: '', sector: '', message: '' })
+  const [submitted, setSubmitted] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setFormState({ ...formState, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    await new Promise((r) => setTimeout(r, 1200))
-    setLoading(false)
-    setSent(true)
+    setSubmitted(true)
+    setTimeout(() => setSubmitted(false), 3000)
+    setFormState({ name: '', company: '', email: '', phone: '', sector: '', message: '' })
   }
 
   return (
-    <section
-      id="contact"
-      className="relative overflow-hidden py-28 lg:py-36"
-      style={{ backgroundColor: 'var(--color-text-primary)' }}
-    >
-      {/* Ambient marquee */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none overflow-hidden select-none">
-        <MarqueeText
-          items={contact.marqueeItems}
-          speed={40}
-          className="opacity-[0.05]"
-          textClassName="text-[clamp(40px,7vw,90px)] font-black text-white whitespace-nowrap"
-        />
-      </div>
+    <section id="contact" className="relative overflow-hidden py-24 lg:py-32" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+      <div className="container mx-auto px-6 lg:px-20">
+        <SectionLabel>{contact.label}</SectionLabel>
+        <h2
+          className="font-black leading-tight mb-4"
+          style={{ fontSize: 'clamp(28px, 4vw, 48px)', color: 'var(--color-text-primary)' }}
+        >
+          {contact.headline}
+        </h2>
+        <p className="text-base leading-[1.9] mb-16 max-w-2xl" style={{ color: 'var(--color-text-secondary)' }}>
+          {contact.body}
+        </p>
 
-      {/* Dot grid */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.06]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
-
-      <div className="container mx-auto px-6 lg:px-10 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-
-          {/* Copy */}
-          <div>
-            <SectionLabel light>{contact.label}</SectionLabel>
-            <FadeUp>
-              <h2
-                className="font-black leading-tight text-white mb-6"
-                style={{ fontSize: 'clamp(32px, 5vw, 64px)', letterSpacing: '-0.03em' }}
-              >
-                {contact.headline}
-              </h2>
-            </FadeUp>
-
-            <FadeUp delay={0.4}>
-              <p className="text-base leading-relaxed mb-12 max-w-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                {contact.body}
-              </p>
-            </FadeUp>
-
-            <FadeUp delay={0.5}>
-              <div className="space-y-5">
-                {[
-                  { label: 'العنوان', value: contact.address,             ltr: false },
-                  { label: 'البريد',  value: contact.email,               ltr: true  },
-                  { label: 'الهاتف',  value: contact.phone,               ltr: true  },
-                ].map((item) => (
-                  <div key={item.label} className="flex gap-4">
-                    <div className="w-16 text-xs font-bold pt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                      {item.label}
-                    </div>
-                    <div className="text-sm text-white" dir={item.ltr ? 'ltr' : undefined}>
-                      {item.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </FadeUp>
-          </div>
-
-          {/* Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ type: 'spring', stiffness: 70, damping: 20, delay: 0.2 }}
-          >
-            <AnimatePresence mode="wait">
-              {sent ? (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="py-16 text-center"
-                >
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                    style={{ backgroundColor: 'var(--color-accent-mint)' }}
-                  >
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                      <path d="M5 14l7 7 11-11" stroke="#001081" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-black text-white mb-2">{contact.success.title}</h3>
-                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{contact.success.body}</p>
-                </motion.div>
-              ) : (
-                <motion.form
-                  key="form"
-                  onSubmit={handleSubmit}
-                  className="space-y-6"
-                >
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { name: 'name',    label: contact.fields.name,    type: 'text' },
-                      { name: 'company', label: contact.fields.company,  type: 'text' },
-                    ].map((field) => (
-                      <div key={field.name}>
-                        <input
-                          type={field.type}
-                          name={field.name}
-                          value={form[field.name as keyof typeof form]}
-                          onChange={handleChange}
-                          placeholder={field.label}
-                          required
-                          className="w-full bg-transparent border-b px-0 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors duration-200 focus:border-white/60"
-                          style={{ borderColor: 'rgba(255,255,255,0.2)' }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      {/* Email — dir="ltr" so typed address reads L-R inside RTL page */}
-                      <input
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder={contact.fields.email}
-                        required
-                        dir="ltr"
-                        className="w-full bg-transparent border-b px-0 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors duration-200 focus:border-white/60 text-start"
-                        style={{ borderColor: 'rgba(255,255,255,0.2)' }}
-                      />
-                    </div>
-                    <div>
-                      {/* Phone — always LTR */}
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        placeholder={contact.fields.phone}
-                        dir="ltr"
-                        className="w-full bg-transparent border-b px-0 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors duration-200 focus:border-white/60 text-start"
-                        style={{ borderColor: 'rgba(255,255,255,0.2)' }}
-                      />
-                    </div>
-                  </div>
-
-                  <select
-                    name="sector"
-                    value={form.sector}
-                    onChange={handleChange}
-                    className="w-full bg-transparent border-b px-0 py-3 text-sm outline-none transition-colors duration-200 appearance-none cursor-pointer"
-                    style={{
-                      borderColor: 'rgba(255,255,255,0.2)',
-                      color: form.sector ? 'white' : 'rgba(255,255,255,0.3)',
-                    }}
-                  >
-                    <option value="" disabled style={{ background: '#001081' }}>{contact.fields.sector}</option>
-                    {contact.sectors.map((s) => (
-                      <option key={s} value={s} style={{ background: '#001081' }}>{s}</option>
-                    ))}
-                  </select>
-
-                  <textarea
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    placeholder={contact.fields.message}
-                    rows={4}
-                    required
-                    className="w-full bg-transparent border-b px-0 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-colors duration-200 resize-none focus:border-white/60"
-                    style={{ borderColor: 'rgba(255,255,255,0.2)' }}
-                  />
-
-                  <MagneticButton
-                    type="submit"
-                    variant="dark"
-                    disabled={loading}
-                    className="w-full justify-center py-4"
-                  >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <motion.div
-                          className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                        />
-                        جارٍ الإرسال...
-                      </span>
-                    ) : (
-                      contact.fields.submit
-                    )}
-                  </MagneticButton>
-                </motion.form>
-              )}
-            </AnimatePresence>
-          </motion.div>
+        <div className="mb-12 opacity-[0.06]">
+          <MarqueeText
+            items={contact.marqueeItems}
+            speed={40}
+            textClassName="text-[clamp(40px,7vw,90px)] font-black text-[var(--color-text-primary)] whitespace-nowrap"
+          />
         </div>
-      </div>
-    </section>
-  )
-}
 
-/* ─── Footer ─────────────────────────────────────────────────────── */
-function Footer() {
-  const { footer } = AR
-  return (
-    <footer
-      style={{
-        backgroundColor: 'var(--color-text-primary)',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
-      }}
-    >
-      <div className="container mx-auto px-6 lg:px-10 py-16 lg:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 mb-16">
-
-          {/* Brand col */}
-          <div className="lg:col-span-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/brand/ejada-white-logo.png"
-              alt="إجادة سيستمز"
-              className="h-8 w-auto mb-5"
-              onError={(e) => {
-                const t = e.target as HTMLImageElement
-                t.style.display = 'none'
-                if (t.parentElement) {
-                  t.parentElement.innerHTML = `<div style="font-size:20px;font-weight:900;color:white;margin-bottom:20px;letter-spacing:-0.03em"><span style="color:var(--color-accent)">إ</span>جادة</div>`
-                }
-              }}
-            />
-            <p className="text-sm leading-relaxed max-w-xs mb-8" style={{ color: 'rgba(255,255,255,0.38)' }}>
-              {footer.tagline}
-            </p>
-            <div className="flex items-center gap-4">
-              <MagneticButton href="#contact" variant="outline" strength={0.2}
-                className="border-white/20 text-white hover:bg-white hover:text-[var(--color-text-primary)]"
-              >
-                {AR.nav.cta}
-              </MagneticButton>
-              <a href="/" className="text-xs text-white/30 hover:text-white/60 transition-colors" dir="ltr">
-                {footer.switchLang}
-              </a>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div>
+            <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
+              معلومات الاتصال
+            </h3>
+            <div className="space-y-6">
+              <div>
+                <div className="text-xs font-semibold mb-2" style={{ color: 'var(--color-text-muted)' }}>
+                  العنوان
+                </div>
+                <div style={{ color: 'var(--color-text-secondary)' }}>{contact.address}</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold mb-2" style={{ color: 'var(--color-text-muted)' }}>
+                  البريد الإلكتروني
+                </div>
+                <a href={`mailto:${contact.email}`} className="hover:text-sky-400 transition-colors" dir="ltr" style={{ color: 'var(--color-text-secondary)' }}>
+                  {contact.email}
+                </a>
+              </div>
+              <div>
+                <div className="text-xs font-semibold mb-2" style={{ color: 'var(--color-text-muted)' }}>
+                  الهاتف
+                </div>
+                <a href={`tel:${contact.phone}`} className="hover:text-sky-400 transition-colors" dir="ltr" style={{ color: 'var(--color-text-secondary)' }}>
+                  {contact.phone}
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Link columns */}
-          {footer.links.map((col, ci) => (
+          <motion.form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="space-y-4"
+            initial={{ opacity: 0, x: 40 }}
+            animate={formInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6 }}
+          >
+            <input
+              type="text"
+              name="name"
+              placeholder={contact.fields.name}
+              value={formState.name}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border bg-transparent text-sm"
+              style={{
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+            />
+            <input
+              type="text"
+              name="company"
+              placeholder={contact.fields.company}
+              value={formState.company}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border bg-transparent text-sm"
+              style={{
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder={contact.fields.email}
+              value={formState.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border bg-transparent text-sm"
+              style={{
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+              dir="ltr"
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder={contact.fields.phone}
+              value={formState.phone}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border bg-transparent text-sm"
+              style={{
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+              dir="ltr"
+            />
+            <select
+              name="sector"
+              value={formState.sector}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border bg-transparent text-sm"
+              style={{
+                borderColor: 'var(--color-border)',
+                color: formState.sector ? 'var(--color-text-primary)' : 'var(--color-text-muted)',
+              }}
+            >
+              <option value="" style={{ backgroundColor: 'var(--color-bg)' }}>
+                {contact.fields.sector}
+              </option>
+              {contact.sectors.map((s) => (
+                <option key={s} value={s} style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text-primary)' }}>
+                  {s}
+                </option>
+              ))}
+            </select>
+            <textarea
+              name="message"
+              placeholder={contact.fields.message}
+              value={formState.message}
+              onChange={handleChange}
+              required
+              rows={4}
+              className="w-full px-4 py-3 border bg-transparent text-sm resize-none"
+              style={{
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text-primary)',
+              }}
+            />
+            <button
+              type="submit"
+              className="w-full px-8 py-3 bg-sky-400 text-[#000850] font-bold text-sm hover:bg-white transition-colors"
+            >
+              {contact.fields.submit}
+            </button>
+
+            <AnimatePresence>
+              {submitted && (
+                <motion.div
+                  className="p-4 border"
+                  style={{
+                    backgroundColor: 'rgba(74, 222, 128, 0.1)',
+                    borderColor: '#4ade80',
+                    color: '#22c55e',
+                  }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <div className="font-bold text-sm">{contact.success.title}</div>
+                  <div className="text-xs mt-1">{contact.success.body}</div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.form>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ─── Footer ──────────────────────────────────────────────────────── */
+function Footer() {
+  const { footer } = AR
+
+  return (
+    <footer className="relative overflow-hidden py-16 lg:py-24" style={{ backgroundColor: '#000520' }}>
+      <div className="container mx-auto px-6 lg:px-20">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
+          <div>
+            <div className="text-sm font-light leading-relaxed opacity-70 mb-4">
+              {footer.tagline}
+            </div>
+            <a href="/" className="text-xs font-medium text-white/40 hover:text-white/70 transition-colors" dir="ltr">
+              {footer.switchLang}
+            </a>
+          </div>
+          {footer.links.map((col) => (
             <div key={col.heading}>
-              <div
-                className="text-[9px] font-bold mb-5"
-                style={{ color: 'rgba(255,255,255,0.28)', letterSpacing: 0 }}
-              >
+              <h4 className="text-xs font-bold mb-4" style={{ color: 'var(--color-accent)' }}>
                 {col.heading}
-              </div>
-              <ul className="space-y-3">
-                {col.items.map((item, ii) => (
-                  <motion.li
-                    key={item}
-                    initial={{ opacity: 0, x: 8 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: ci * 0.05 + ii * 0.04 }}
-                  >
-                    <a
-                      href="#"
-                      className="text-sm transition-colors duration-200"
-                      style={{ color: 'rgba(255,255,255,0.45)' }}
-                      onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'white')}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.45)')}
-                    >
+              </h4>
+              <ul className="space-y-2">
+                {col.items.map((item) => (
+                  <li key={item}>
+                    <a href="#" className="text-xs text-white/40 hover:text-white/70 transition-colors">
                       {item}
                     </a>
-                  </motion.li>
+                  </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
 
-        {/* Bottom bar */}
         <div
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
+          className="pt-8"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
         >
-          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.28)' }}>
-            {footer.copyright}
-          </p>
-          <div className="flex items-center gap-5 text-xs" style={{ color: 'rgba(255,255,255,0.28)' }}>
-            <a href="https://www.ejada.com" className="hover:text-white transition-colors" dir="ltr">
-              www.ejada.com
-            </a>
-            <span>·</span>
-            <a href="mailto:info@ejada.com" className="hover:text-white transition-colors" dir="ltr">
-              info@ejada.com
-            </a>
-            <span>·</span>
-            <span>الرياض، المملكة العربية السعودية</span>
-          </div>
+          <div className="text-xs text-white/40">{footer.copyright}</div>
         </div>
       </div>
     </footer>
   )
 }
 
-/* ─── Page ───────────────────────────────────────────────────────── */
-export default function ArabicHome() {
+/* ─── Main Export ─────────────────────────────────────────────────── */
+export default function Page() {
   return (
-    <main>
+    <main dir="rtl" className="rtl" style={{ backgroundColor: 'var(--color-bg)' }}>
       <Nav />
       <Hero />
       <WhoWeAre />

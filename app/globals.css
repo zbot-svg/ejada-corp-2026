@@ -230,6 +230,26 @@
   font-family: 'Noto Sans Arabic', 'Readex Pro', system-ui, sans-serif;
 }
 
+/* ─── RTL Typography Safety ────────────────────────────────── */
+/* Arabic is a connected script — positive letter-spacing breaks
+   glyph joins, and uppercase has no meaning. Override Tailwind
+   utilities that break Arabic when used inside RTL pages.       */
+[dir="rtl"] .uppercase {
+  text-transform: none !important;
+}
+[dir="rtl"] .tracking-wider,
+[dir="rtl"] .tracking-widest {
+  letter-spacing: 0 !important;
+}
+/* Font-display / heading utility classes use negative tracking
+   (tightening) which is fine for Latin but clips Arabic.       */
+[dir="rtl"] .font-display,
+[dir="rtl"] .font-h1,
+[dir="rtl"] .font-h2,
+[dir="rtl"] .font-h3 {
+  letter-spacing: 0;
+}
+
 [dir="rtl"] .section-pad {
   padding-top: var(--spacing-section);
   padding-bottom: var(--spacing-section);
