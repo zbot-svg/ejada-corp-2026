@@ -38,7 +38,7 @@ export default async function PayloadAdminLayout({
     config: resolvedConfig,
     i18n,
     importMap,
-    user: undefined,
+    user: null,
   }) as ClientConfig
 
   return (
