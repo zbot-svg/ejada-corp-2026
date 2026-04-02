@@ -45,102 +45,193 @@ body {
 }
 
 /* ── Login / Create-first-user page ───────────────────────────────────── */
-.login,
-[class*="loginPage"],
-.payload-default .template-default--no-nav {
+/* Payload uses .template-minimal for both login and create-first-user */
+.template-minimal {
   background: linear-gradient(135deg, #000820 0%, #001081 50%, #0018A0 100%) !important;
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* The login form card */
-.login .card,
-.login form,
-[class*="loginForm"],
-.template-default--no-nav .card {
+.template-minimal .template-minimal__wrap {
   background: rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 12px !important;
+  border-radius: 16px !important;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3) !important;
+  padding: 40px !important;
+  max-width: 480px;
+  width: 100%;
 }
 
-/* Login page text */
-.login h1,
-.login h2,
-.login label,
-.login p,
-.template-default--no-nav h1,
-.template-default--no-nav h2,
-.template-default--no-nav label,
-.template-default--no-nav p {
+/* Create-first-user specific */
+.create-first-user h1,
+.login h1 {
+  color: #FFFFFF !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px !important;
+}
+
+.create-first-user > p,
+.login > p {
+  color: rgba(255, 255, 255, 0.45) !important;
+  font-size: 13px !important;
+  margin-bottom: 24px !important;
+}
+
+/* All text inside the minimal template */
+.template-minimal h1,
+.template-minimal h2,
+.template-minimal label,
+.template-minimal p {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Login inputs */
-.login input,
-.template-default--no-nav input {
+.template-minimal .field-label {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Login/create inputs */
+.template-minimal input[type="text"],
+.template-minimal input[type="email"],
+.template-minimal input[type="password"] {
   background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   color: #FFFFFF !important;
   border-radius: 8px !important;
+  padding: 10px 14px !important;
+  font-size: 14px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.login input:focus,
-.template-default--no-nav input:focus {
+.template-minimal input:focus {
   border-color: #0070C0 !important;
   box-shadow: 0 0 0 3px rgba(0, 112, 192, 0.25) !important;
+  outline: none !important;
 }
 
-.login input::placeholder,
-.template-default--no-nav input::placeholder {
-  color: rgba(255, 255, 255, 0.35) !important;
+.template-minimal input::placeholder {
+  color: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Login button */
-.login button[type="submit"],
-.template-default--no-nav button[type="submit"] {
-  background: #0070C0 !important;
+/* Submit button on login/create */
+.template-minimal .form-submit .btn,
+.template-minimal button[type="submit"] {
+  background: linear-gradient(135deg, #0070C0 0%, #005CA0 100%) !important;
   color: #FFFFFF !important;
   border: none !important;
   border-radius: 8px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
   letter-spacing: 0.02em;
-  padding: 12px 24px !important;
+  padding: 12px 28px !important;
   transition: all 0.2s ease !important;
+  width: 100%;
+  cursor: pointer;
 }
 
-.login button[type="submit"]:hover,
-.template-default--no-nav button[type="submit"]:hover {
-  background: #005CA0 !important;
+.template-minimal .form-submit .btn:hover,
+.template-minimal button[type="submit"]:hover {
+  background: linear-gradient(135deg, #005CA0 0%, #004880 100%) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 112, 192, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 112, 192, 0.4) !important;
 }
 
-/* Login links */
-.login a,
-.template-default--no-nav a {
+/* Links */
+.template-minimal a {
+  color: rgba(255, 255, 255, 0.5) !important;
+  transition: color 0.2s ease;
+}
+
+.template-minimal a:hover {
   color: #0070C0 !important;
 }
 
-/* Muted helper text on login */
-.login .field-description,
-.template-default--no-nav .field-description {
-  color: rgba(255, 255, 255, 0.4) !important;
+/* Muted helper text */
+.template-minimal .field-description {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Required asterisk */
+.template-minimal .required {
+  color: #1FED93 !important;
 }
 
 /* Select / dropdown on create-first-user */
-.login .rs__control,
-.template-default--no-nav .rs__control,
-.login [class*="ReactSelect"],
-.template-default--no-nav [class*="ReactSelect"] {
+.template-minimal .rs__control {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
 }
 
-.login .rs__single-value,
-.template-default--no-nav .rs__single-value {
+.template-minimal .rs__single-value,
+.template-minimal .react-select--single-value,
+.template-minimal [class*="singleValue"] {
   color: #FFFFFF !important;
+}
+
+.template-minimal .rs__menu,
+.template-minimal [class*="menu"] {
+  background: #001081 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
+}
+
+.template-minimal .rs__option,
+.template-minimal [class*="option"] {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.template-minimal .rs__option--is-focused {
+  background: rgba(0, 112, 192, 0.3) !important;
+}
+
+/* Dropdown indicators */
+.template-minimal .dropdown-indicator,
+.template-minimal .clear-indicator {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Dropzone / Avatar upload */
+.template-minimal .dropzone {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+}
+
+/* Ejada branding watermark */
+.template-minimal::before {
+  content: 'ejada';
+  position: absolute;
+  top: 32px;
+  left: 40px;
+  font-size: 22px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.12);
+  letter-spacing: -0.03em;
+  pointer-events: none;
+}
+
+.template-minimal::after {
+  content: 'Content Management System';
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
 }
 
 /* ── Sidebar / Nav ────────────────────────────────────────────────────── */

@@ -27,8 +27,7 @@ import { handleServerFunctions } from '@payloadcms/next/layouts'
 import config from '@payload-config'
 import { importMap } from './admin/importMap'
 
-// Ejada admin branding
-import '@/styles/admin.css'
+// Admin CSS is loaded via AdminStyleProvider component (registered as admin.components.providers)
 
 // ─── Inlined: getRequestTheme ────────────────────────────────────────────────
 // (mirrors @payloadcms/next/dist/utilities/getRequestTheme.js)

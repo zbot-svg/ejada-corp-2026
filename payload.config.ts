@@ -147,6 +147,7 @@ export default buildConfig({
         Logo: '/components/admin/Logo#Logo',
         Icon: '/components/admin/Icon#Icon',
       },
+      providers: ['/components/admin/AdminStyleProvider#AdminStyleProvider'],
       beforeLogin: ['/components/admin/BeforeLogin#BeforeLogin'],
       beforeDashboard: ['/components/admin/DashboardBanner#DashboardBanner'],
       afterNavLinks: ['/components/admin/NavFooter#NavFooter'],
