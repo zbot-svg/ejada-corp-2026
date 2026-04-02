@@ -265,9 +265,49 @@ body {
   pointer-events: none;
 }
 
-/* ── Sidebar / Nav ────────────────────────────────────────────────────── */
-.nav {
-  border-right-color: var(--theme-color-gray-100) !important;
+/* ── Admin layout fix ─────────────────────────────────────────────────
+   Turbopack drops some of Payload's own layout CSS, so we re-declare
+   the critical sidebar + content grid here.
+   ──────────────────────────────────────────────────────────────────── */
+.template-default {
+  display: grid !important;
+  grid-template-columns: 230px 1fr !important;
+  min-height: 100vh !important;
+}
+
+.template-default > aside.nav,
+.template-default > .nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 230px !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--theme-elevation-1, #FFFFFF) !important;
+  border-right: 1px solid var(--theme-color-gray-100, #EEE9E0) !important;
+  z-index: 100 !important;
+  padding-bottom: 80px !important;
+}
+
+/* Nav links — each on its own line */
+.nav-group a,
+.nav-group button {
+  display: block !important;
+  padding: 6px 16px 6px 20px !important;
+  font-size: 13px !important;
+  color: var(--theme-text) !important;
+  text-decoration: none !important;
+  transition: background 0.15s ease !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.nav-group a:hover {
+  background: rgba(0, 16, 129, 0.04) !important;
 }
 
 /* Nav group headings */
@@ -278,6 +318,19 @@ body {
   font-size: 10px !important;
   color: var(--theme-text) !important;
   opacity: 0.5;
+  padding: 12px 16px 4px 16px !important;
+  display: block !important;
+}
+
+/* Nav group toggle button */
+.nav-group__toggle {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 12px 16px 4px 16px !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
 }
 
 /* Active nav item */
@@ -286,6 +339,48 @@ body {
   color: #0070C0 !important;
   font-weight: 600 !important;
   border-radius: 6px;
+}
+
+/* Nav header (logo + branding) */
+.nav > header,
+.nav > div:first-child {
+  padding: 16px !important;
+}
+
+/* Nav footer */
+.nav__footer {
+  margin-top: auto !important;
+  padding: 12px 16px !important;
+  border-top: 1px solid var(--theme-color-gray-100, #EEE9E0) !important;
+}
+
+/* ── Top header bar ──────────────────────────────────────────────────── */
+.template-default > header,
+.app-header {
+  margin-left: 0 !important;
+}
+
+/* ── Main content area ───────────────────────────────────────────────── */
+.template-default > .template-default__wrap {
+  grid-column: 2 !important;
+}
+
+/* Mobile: collapse sidebar */
+@media (max-width: 768px) {
+  .template-default {
+    display: block !important;
+    grid-template-columns: 1fr !important;
+  }
+  .template-default > aside.nav,
+  .template-default > .nav {
+    position: fixed !important;
+    left: -240px !important;
+    transition: left 0.3s ease !important;
+  }
+  .template-default > aside.nav.nav--nav-open,
+  .template-default > .nav.nav--nav-open {
+    left: 0 !important;
+  }
 }
 
 /* ── Dashboard ────────────────────────────────────────────────────────── */
