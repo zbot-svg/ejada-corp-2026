@@ -157,7 +157,8 @@ export default async function PayloadAdminLayout({
     config: resolvedConfig,
     i18n,
     importMap,
-    user: req.user,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    user: req.user as any,
   })
 
   await applyLocaleFiltering({ clientConfig, config: resolvedConfig, req })
