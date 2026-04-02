@@ -915,6 +915,20 @@ function WhatWeBelieve() {
             </motion.div>
           ))}
         </Stagger>
+
+        {/* Pull-quote */}
+        {whatWeBelieve.quote && (
+          <div className="mt-16 pt-12 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+            <blockquote className="text-2xl md:text-3xl font-bold text-white leading-snug max-w-3xl">
+              {whatWeBelieve.quote}
+            </blockquote>
+            {whatWeBelieve.quoteAttrib && (
+              <p className="mt-4 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                {whatWeBelieve.quoteAttrib}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </section>
   )

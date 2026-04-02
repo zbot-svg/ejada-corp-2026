@@ -40,6 +40,18 @@ export const WhatWeBelieve: GlobalConfig = {
       ],
     },
     {
+      name: 'quote',
+      type: 'text',
+      localized: true,
+      admin: { description: 'Optional pull-quote displayed below the belief cards.' },
+    },
+    {
+      name: 'quoteAttribution',
+      type: 'text',
+      localized: true,
+      admin: { description: 'Attribution line for the quote, e.g. "— Ejada Systems".' },
+    },
+    {
       name: 'backdropWords',
       type: 'array',
       label: 'Backdrop Marquee Words',
