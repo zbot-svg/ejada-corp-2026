@@ -1,3 +1,6 @@
+// Admin CSS — imported here because this module is loaded client-side for all admin routes
+import '@/styles/admin.css'
+
 import { Logo as Logo_0 } from '@/components/admin/Logo'
 import { Icon as Icon_0 } from '@/components/admin/Icon'
 import { AdminStyleProvider as AdminStyleProvider_0 } from '@/components/admin/AdminStyleProvider'
