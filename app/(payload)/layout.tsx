@@ -169,15 +169,22 @@ export default async function PayloadAdminLayout({
       dateFNSKey={i18n.dateFNSKey}
       fallbackLang={resolvedConfig.i18n.fallbackLanguage}
       isNavOpen={navPrefs?.open ?? true}
-      languageCode={languageCode}
-      languageOptions={languageOptions}
-      locale={req.locale}
-      permissions={req.user ? permissions : null}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      languageCode={languageCode as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      languageOptions={languageOptions as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      locale={req.locale as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      permissions={req.user ? (permissions as any) : null}
       serverFunction={serverFunction}
       switchLanguageServerAction={switchLanguageServerAction}
-      theme={theme}
-      translations={i18n.translations}
-      user={req.user}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      theme={theme as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      translations={i18n.translations as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      user={req.user as any}
     >
       {children}
     </RootProvider>
