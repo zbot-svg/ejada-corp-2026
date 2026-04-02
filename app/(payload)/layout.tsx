@@ -34,11 +34,12 @@ export default async function PayloadAdminLayout({
   })
 
   // Get serializable client config (functions stripped, safe for RSC → client boundary)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const clientConfig = getClientConfig({
     config: resolvedConfig,
     i18n,
     importMap,
-    user: null,
+    user: null as any,
   }) as ClientConfig
 
   return (
