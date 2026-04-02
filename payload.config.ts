@@ -6,6 +6,38 @@ import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
+// ── Collections ────────────────────────────────────────────────────────────
+import {
+  Users,
+  Media,
+  CaseStudies,
+  Partners,
+  Capabilities,
+  Sectors,
+  Insights,
+  ContactSubmissions,
+} from './collections'
+
+// ── Globals ────────────────────────────────────────────────────────────────
+import {
+  SiteSettings,
+  Navigation,
+  Hero,
+  WhoWeAre,
+  WhatWeBelieve,
+  OrchestratorModel,
+  Values,
+  WhatWeEnable,
+  ProofPoints,
+  Contact,
+  Footer,
+} from './globals'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Custom production migration — creates all Payload tables via Drizzle schema
+// introspection without requiring drizzle-kit (which has missing deps on Vercel).
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Map a Drizzle column's SQLite type to a DDL type string.
  */
@@ -94,177 +126,68 @@ async function initialSchemaMigration({ payload }: MigrateUpArgs): Promise<void>
   payload.logger.info({ msg: 'Schema applied via drizzle-orm introspection' })
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
+const dirname  = path.dirname(filename)
 
 export default buildConfig({
+  // ── Admin UI ────────────────────────────────────────────────────────────
   admin: {
     user: 'users',
     meta: {
-      title: 'Ejada CMS',
+      title:       'Ejada CMS',
       description: 'Ejada Systems content management',
+    },
+    components: {
+      // Custom logo/icon can be swapped in here later
     },
   },
 
+  // ── Rich-text editor ────────────────────────────────────────────────────
   editor: lexicalEditor(),
 
+  // ── Localization ────────────────────────────────────────────────────────
+  localization: {
+    locales: [
+      { label: 'English', code: 'en' },
+      { label: 'العربية', code: 'ar', rtl: true },
+    ],
+    defaultLocale: 'en',
+    fallback: true,
+  },
+
+  // ── Collections ─────────────────────────────────────────────────────────
   collections: [
-    {
-      slug: 'users',
-      auth: true,
-      admin: { useAsTitle: 'email' },
-      fields: [],
-    },
-    {
-      slug: 'media',
-      upload: true,
-      fields: [
-        { name: 'alt', type: 'text', required: true },
-        { name: 'caption', type: 'text' },
-      ],
-    },
-    {
-      slug: 'case-studies',
-      admin: { useAsTitle: 'title' },
-      fields: [
-        { name: 'title', type: 'text', required: true },
-        { name: 'client', type: 'text', required: true },
-        { name: 'sector', type: 'select', options: [
-          'Financial Services', 'Government', 'Healthcare',
-          'Transportation', 'Retail', 'Real Estate', 'Energy',
-        ]},
-        { name: 'badge', type: 'text' },
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-        },
-        {
-          name: 'outcomes',
-          type: 'array',
-          fields: [
-            { name: 'title', type: 'text', required: true },
-            { name: 'description', type: 'text', required: true },
-          ],
-        },
-        { name: 'featured', type: 'checkbox', defaultValue: false },
-      ],
-    },
-    {
-      slug: 'partners',
-      admin: { useAsTitle: 'name' },
-      fields: [
-        { name: 'name', type: 'text', required: true },
-        { name: 'logo', type: 'upload', relationTo: 'media' },
-        { name: 'website', type: 'text' },
-        { name: 'order', type: 'number', defaultValue: 0 },
-      ],
-    },
+    Users,
+    Media,
+    CaseStudies,
+    Partners,
+    Capabilities,
+    Sectors,
+    Insights,
+    ContactSubmissions,
   ],
 
+  // ── Globals ──────────────────────────────────────────────────────────────
   globals: [
-    // ── Site Settings (theme, SEO, contact) ──────────────────────
-    {
-      slug: 'site-settings',
-      label: 'Site Settings',
-      admin: {
-        description: 'Global site configuration including theme, contact info, and SEO defaults.',
-      },
-      fields: [
-        // Theme switcher — feeds ThemeProvider on the frontend
-        {
-          name: 'theme',
-          type: 'select',
-          label: 'Color Theme',
-          defaultValue: 'light',
-          options: [
-            { label: 'Light — Warm cream + Navy (default)', value: 'light' },
-            { label: 'Dark — Deep navy + Electric blue', value: 'dark' },
-            { label: 'Electric — Pure white + Vivid blue', value: 'electric' },
-          ],
-          admin: {
-            description: 'Controls the global color theme across the entire website.',
-          },
-        },
+    // Configuration
+    SiteSettings,
+    Navigation,
+    Footer,
 
-        // Custom accent color override
-        {
-          type: 'collapsible',
-          label: 'Custom Colors (optional overrides)',
-          fields: [
-            { name: 'accentColor', type: 'text', label: 'Accent Color (hex)', defaultValue: '#0000FF' },
-            { name: 'accentMint', type: 'text', label: 'Mint Accent (hex)', defaultValue: '#1FED93' },
-          ],
-        },
-
-        // Contact details
-        {
-          type: 'collapsible',
-          label: 'Contact Information',
-          fields: [
-            { name: 'address', type: 'text', defaultValue: 'Riyadh, Saudi Arabia' },
-            { name: 'email', type: 'email', defaultValue: 'info@ejada.com' },
-            { name: 'phone', type: 'text', defaultValue: '+966 11 000 0000' },
-          ],
-        },
-
-        // SEO
-        {
-          type: 'collapsible',
-          label: 'SEO Defaults',
-          fields: [
-            { name: 'seoTitle', type: 'text', defaultValue: 'Ejada Systems — National Transformation Orchestrator' },
-            { name: 'seoDescription', type: 'textarea' },
-            { name: 'ogImage', type: 'upload', relationTo: 'media' },
-          ],
-        },
-      ],
-    },
-
-    // ── Navigation ─────────────────────────────────────────────
-    {
-      slug: 'navigation',
-      label: 'Navigation',
-      fields: [
-        {
-          name: 'links',
-          type: 'array',
-          label: 'Nav Links',
-          fields: [
-            { name: 'label', type: 'text', required: true },
-            { name: 'href', type: 'text', required: true },
-          ],
-        },
-        {
-          name: 'ctaLabel',
-          type: 'text',
-          defaultValue: 'Get in Touch',
-        },
-      ],
-    },
-
-    // ── Hero ───────────────────────────────────────────────────
-    {
-      slug: 'hero',
-      label: 'Hero Section',
-      fields: [
-        { name: 'eyebrow', type: 'text', defaultValue: 'Corporate Profile — 2026' },
-        { name: 'headline', type: 'text', defaultValue: 'Architects of Coherence.' },
-        { name: 'tagline', type: 'text', defaultValue: 'Custodians of Trust.' },
-        { name: 'backgroundImage', type: 'upload', relationTo: 'media' },
-        {
-          name: 'stats',
-          type: 'array',
-          label: 'Hero Stats',
-          fields: [
-            { name: 'value', type: 'text', required: true },
-            { name: 'label', type: 'text', required: true },
-          ],
-        },
-      ],
-    },
+    // Page sections (in render order)
+    Hero,
+    WhoWeAre,
+    WhatWeBelieve,
+    OrchestratorModel,
+    Values,
+    WhatWeEnable,
+    ProofPoints,
+    Contact,
   ],
 
+  // ── Database ─────────────────────────────────────────────────────────────
   db: sqliteAdapter({
     // On Vercel the project root is read-only — only /tmp is writable.
     // If DATABASE_URI is a relative file path (e.g. "file:./ejada.db"), rewrite it
@@ -282,16 +205,22 @@ export default buildConfig({
       })(),
     },
     // push: true for local dev (NODE_ENV !== 'production').
-    // prodMigrations handles production cold starts via drizzle-kit/api push.
+    // prodMigrations handles production cold starts via schema introspection.
     push: true,
     prodMigrations: [
       { name: 'initial', up: initialSchemaMigration, down: async () => {} },
     ],
   }),
 
+  // ── Security ─────────────────────────────────────────────────────────────
   secret: process.env.PAYLOAD_SECRET || 'ejada-cms-secret-dev-key-change-in-production',
 
+  // ── TypeScript ───────────────────────────────────────────────────────────
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+
+  // ── CORS / CSRF ──────────────────────────────────────────────────────────
+  cors:  [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'].filter(Boolean),
+  csrf:  [process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'].filter(Boolean),
 })
