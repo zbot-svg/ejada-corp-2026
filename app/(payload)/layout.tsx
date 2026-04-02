@@ -1,20 +1,34 @@
 /**
- * Payload admin layout — provides ConfigProvider context for all admin pages.
+ * Payload admin layout — provides the full RootProvider context tree for all admin pages.
  *
- * Payload's PageConfigProvider (used inside RootPage) calls useConfig() which
- * requires a parent ConfigProvider. Without this layout, useConfig() returns
- * undefined and the admin throws TypeError: Cannot destructure property 'config'.
+ * This mirrors Payload's own RootLayout (from @payloadcms/next/layouts) but intentionally
+ * omits the <html>/<body> wrapper since Next.js requires those to exist only in the root
+ * app layout (app/layout.tsx). Without this layout the admin throws errors like:
+ *   - TypeError: Cannot destructure property 'config' (missing ConfigProvider)
+ *   - Error: useServerFunctions must be used within a ServerFunctionsProvider
  *
- * This layout does NOT render <html>/<body> (the root app layout handles those).
- * It only adds Payload's config context around admin routes.
+ * We import from internal dist paths for utilities that are not re-exported publicly.
  */
-import type { ClientConfig } from 'payload'
-import React from 'react'
-import config from '@payload-config'
-import { getPayload } from 'payload'
-import { initI18n } from '@payloadcms/translations'
-import { ConfigProvider } from '@payloadcms/ui'
+import { rtlLanguages } from '@payloadcms/translations'
+import { RootProvider } from '@payloadcms/ui'
 import { getClientConfig } from '@payloadcms/ui/utilities/getClientConfig'
+import { cookies as nextCookies } from 'next/headers'
+import { applyLocaleFiltering } from 'payload/shared'
+import React from 'react'
+
+import { handleServerFunctions } from '@payloadcms/next/layouts'
+// Internal utilities — not in the public exports barrel but stable dist paths
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { getNavPrefs } from '@payloadcms/next/dist/elements/Nav/getNavPrefs.js'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { getRequestTheme } from '@payloadcms/next/dist/utilities/getRequestTheme.js'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { initReq } from '@payloadcms/next/dist/utilities/initReq.js'
+
+import config from '@payload-config'
 import { importMap } from './admin/importMap'
 
 export default async function PayloadAdminLayout({
@@ -22,29 +36,78 @@ export default async function PayloadAdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Initialize Payload (uses singleton — subsequent calls are cached)
-  const resolvedConfig = await config
-  const payload = await getPayload({ config: resolvedConfig, importMap })
+  // Server Action used by RootProvider → ServerFunctionsProvider to dispatch
+  // named admin operations (form-state, render-document, render-list, etc.)
+  async function serverFunction(args: Parameters<typeof handleServerFunctions>[0]) {
+    'use server'
+    return handleServerFunctions({ ...args, config, importMap })
+  }
 
-  // Build i18n (English default for unauthenticated access like create-first-user)
-  const i18n = await initI18n({
-    config: resolvedConfig.i18n,
-    context: 'client',
-    language: 'en',
-  })
+  const {
+    cookies,
+    headers,
+    languageCode,
+    permissions,
+    req,
+    req: {
+      payload: { config: resolvedConfig },
+    },
+  } = await initReq({ configPromise: config, importMap, key: 'PayloadAdminLayout' })
 
-  // Get serializable client config (functions stripped, safe for RSC → client boundary)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const theme = getRequestTheme({ config: resolvedConfig, cookies, headers })
+  const dir = rtlLanguages.includes(languageCode) ? 'RTL' : 'LTR'
+
+  const languageOptions = Object.entries(resolvedConfig.i18n.supportedLanguages || {}).reduce(
+    (acc: { label: string; value: string }[], [language, languageConfig]: [string, any]) => {
+      if (Object.keys(resolvedConfig.i18n.supportedLanguages).includes(language)) {
+        acc.push({
+          label: languageConfig.translations.general.thisLanguage,
+          value: language,
+        })
+      }
+      return acc
+    },
+    [],
+  )
+
+  async function switchLanguageServerAction(lang: string) {
+    'use server'
+    const cookies = await nextCookies()
+    cookies.set({
+      name: `${resolvedConfig.cookiePrefix || 'payload'}-lng`,
+      path: '/',
+      value: lang,
+    })
+  }
+
+  const navPrefs = await getNavPrefs(req)
+
   const clientConfig = getClientConfig({
     config: resolvedConfig,
-    i18n,
+    i18n: req.i18n,
     importMap,
-    user: null as any,
-  }) as ClientConfig
+    user: req.user,
+  })
+
+  await applyLocaleFiltering({ clientConfig, config: resolvedConfig, req })
 
   return (
-    <ConfigProvider config={clientConfig}>
+    <RootProvider
+      config={clientConfig}
+      dateFNSKey={req.i18n.dateFNSKey}
+      fallbackLang={resolvedConfig.i18n.fallbackLanguage}
+      isNavOpen={navPrefs?.open ?? true}
+      languageCode={languageCode}
+      languageOptions={languageOptions}
+      locale={req.locale}
+      permissions={req.user ? permissions : null}
+      serverFunction={serverFunction}
+      switchLanguageServerAction={switchLanguageServerAction}
+      theme={theme}
+      translations={req.i18n.translations}
+      user={req.user}
+    >
       {children}
-    </ConfigProvider>
+    </RootProvider>
   )
 }
