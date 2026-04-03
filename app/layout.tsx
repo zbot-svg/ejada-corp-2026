@@ -22,6 +22,7 @@ export default async function RootLayout({
   const headersList = await headers()
   const pathname = headersList.get('x-pathname') ?? ''
   const isArabic = pathname.startsWith('/ar')
+  const isAdmin = pathname.startsWith('/admin')
 
   return (
     <html
@@ -37,14 +38,19 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased" style={{ cursor: 'none' }}>
-        <ThemeProvider defaultTheme="light">
-          <SmoothScroll>
-            <MagneticCursor />
-            <ScrollProgress />
-            {children}
-          </SmoothScroll>
-        </ThemeProvider>
+      <body className="antialiased" style={isAdmin ? undefined : { cursor: 'none' }}>
+        {isAdmin ? (
+          /* Admin panel: no custom cursor, smooth scroll, or progress bar */
+          children
+        ) : (
+          <ThemeProvider defaultTheme="light">
+            <SmoothScroll>
+              <MagneticCursor />
+              <ScrollProgress />
+              {children}
+            </SmoothScroll>
+          </ThemeProvider>
+        )}
       </body>
     </html>
   )
