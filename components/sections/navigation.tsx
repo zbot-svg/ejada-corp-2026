@@ -38,7 +38,7 @@ export default function Navigation() {
   }, [])
 
   useEffect(() => {
-    const sectionIds = pageContent.nav.links.map(l => l.href.replace('#', ''))
+    const sectionIds = pageContent.nav.links.map((l: any) => l.href.replace('#', ''))
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -47,7 +47,7 @@ export default function Navigation() {
       },
       { rootMargin: '-40% 0px -55% 0px' }
     )
-    sectionIds.forEach(id => {
+    sectionIds.forEach((id: string) => {
       const el = document.getElementById(id)
       if (el) observer.observe(el)
     })
@@ -102,7 +102,7 @@ export default function Navigation() {
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-1">
-              {pageContent.nav.links.map((link) => {
+              {pageContent.nav.links.map((link: any) => {
                 const isActive = activeSection === link.href.replace('#', '')
                 return (
                   <a
@@ -233,7 +233,7 @@ export default function Navigation() {
             transition={{ type: 'spring', stiffness: 80, damping: 20 }}
           >
             <nav className="flex flex-col gap-2">
-              {pageContent.nav.links.map((link, i) => (
+              {pageContent.nav.links.map((link: any, i: number) => (
                 <motion.a
                   key={link.href}
                   href={link.href}

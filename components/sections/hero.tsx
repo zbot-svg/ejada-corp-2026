@@ -162,7 +162,7 @@ export default function Hero() {
             className="flex flex-wrap gap-8 pt-8"
             style={{ borderTop: '1px solid var(--color-border)' }}
           >
-            {hero.stats.map((stat) => (
+            {hero.stats.map((stat: any) => (
               <div key={stat.label}>
                 <div
                   className="text-2xl font-black tracking-tight"

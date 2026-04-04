@@ -72,7 +72,7 @@ export default function OrchestratorModel() {
 
         {/* Pillars */}
         <Stagger stagger={0.1} direction="up" distance={32} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {orchestratorModel.pillars.map((pillar, i) => (
+          {orchestratorModel.pillars.map((pillar: any, i: number) => (
             <motion.div
               key={pillar.number}
               className="relative p-6 border group cursor-default"

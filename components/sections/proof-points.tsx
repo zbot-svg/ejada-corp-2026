@@ -72,7 +72,7 @@ export default function ProofPoints() {
           className="grid grid-cols-2 lg:grid-cols-4 gap-0 border-t border-b"
           style={{ borderColor: 'rgba(255,255,255,0.1)' }}
         >
-          {proofPoints.stats.map((stat, i) => (
+          {proofPoints.stats.map((stat: any, i: number) => (
             <motion.div
               key={stat.label}
               className="relative py-10 px-6 lg:px-10"

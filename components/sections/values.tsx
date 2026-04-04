@@ -44,7 +44,7 @@ export default function Values() {
           {/* Right — staggered values list */}
           <FadeRight delay={0.15}>
             <div className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
-              {values.values.map((val, i) => (
+              {values.values.map((val: any, i: number) => (
                 <motion.div
                   key={val.letter}
                   className="group flex items-start gap-5 py-5 cursor-default"

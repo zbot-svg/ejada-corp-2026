@@ -47,7 +47,7 @@ export default function Partners() {
         pauseOnHover
         className="mb-3"
       >
-        {partners.list.slice(0, Math.ceil(partners.list.length / 2)).map((name) => (
+        {partners.list.slice(0, Math.ceil(partners.list.length / 2)).map((name: any) => (
           <div
             key={name}
             className="flex-shrink-0 px-8 py-5 border-r text-sm font-bold uppercase tracking-widest cursor-default transition-colors duration-200"
@@ -70,7 +70,7 @@ export default function Partners() {
         gap={0}
         pauseOnHover
       >
-        {partners.list.slice(Math.ceil(partners.list.length / 2)).map((name) => (
+        {partners.list.slice(Math.ceil(partners.list.length / 2)).map((name: any) => (
           <div
             key={name}
             className="flex-shrink-0 px-8 py-5 border-r text-sm font-bold uppercase tracking-widest cursor-default transition-colors duration-200"

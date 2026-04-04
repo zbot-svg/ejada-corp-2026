@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { getHomeContent } from '@/lib/get-home-content'
 import { ContentProvider } from '@/lib/content-context'
 import Navigation from '@/components/sections/navigation'
 import Hero from '@/components/sections/hero'
@@ -16,12 +17,17 @@ import Footer from '@/components/sections/footer'
 
 export const metadata: Metadata = {
   title: 'Ejada Systems — National Transformation Orchestrator',
-  description: 'Saudi Arabia\'s leading technology transformation partner. 20 years orchestrating enterprise transformation across finance, government, healthcare, and beyond.',
+  description: "Saudi Arabia's leading technology transformation partner. 20 years orchestrating enterprise transformation across finance, government, healthcare, and beyond.",
 }
 
-export default function Home() {
+// ISR: revalidate every 60 seconds
+export const revalidate = 60
+
+export default async function HomePage() {
+  const cmsData = await getHomeContent('en')
+
   return (
-    <ContentProvider locale="en">
+    <ContentProvider locale="en" cmsContent={cmsData as any}>
       <main>
         <Navigation />
         <Hero />
