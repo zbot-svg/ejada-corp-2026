@@ -1,5 +1,3 @@
-import type { Metadata } from 'next'
-import { getHomeContent } from '@/lib/get-home-content'
 import { ContentProvider } from '@/lib/content-context'
 import Navigation from '@/components/sections/navigation'
 import Hero from '@/components/sections/hero'
@@ -15,19 +13,9 @@ import Partners from '@/components/sections/partners'
 import Contact from '@/components/sections/contact'
 import Footer from '@/components/sections/footer'
 
-export const metadata: Metadata = {
-  title: 'Ejada Systems — التحول الوطني',
-  description: 'شريك التحول التقني الرائد في المملكة العربية السعودية',
-}
-
-// ISR: revalidate every 60 seconds
-export const revalidate = 60
-
-export default async function ArabicHomePage() {
-  const cmsData = await getHomeContent('ar')
-
+export default function ArabicHome() {
   return (
-    <ContentProvider locale="ar" cmsContent={cmsData as any}>
+    <ContentProvider locale="ar">
       <main>
         <Navigation />
         <Hero />

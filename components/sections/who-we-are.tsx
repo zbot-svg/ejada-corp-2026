@@ -39,7 +39,7 @@ export default function WhoWeAre() {
               </FadeUp>
 
               <div className="grid grid-cols-3 gap-6">
-                {whoWeAre.stats.slice(0, 6).map((stat: any, i: number) => (
+                {whoWeAre.stats.slice(0, 6).map((stat, i) => (
                   <div key={stat.label} className="border-t pt-4" style={{ borderColor: 'var(--color-border)' }}>
                     <CountUp value={stat.value} label={stat.label} size="lg" delay={i * 0.1 + 0.2} />
                   </div>
@@ -87,7 +87,7 @@ export default function WhoWeAre() {
           </FadeUp>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {footprint.locations.map((loc: any, i: number) => (
+            {footprint.locations.map((loc, i) => (
               <motion.div key={loc.city}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}

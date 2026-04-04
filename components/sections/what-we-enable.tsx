@@ -36,7 +36,7 @@ export default function WhatWeEnable() {
 
         {/* Outcome cards — horizontal scroll on mobile, grid on desktop */}
         <div className="flex lg:grid lg:grid-cols-5 gap-4 overflow-x-auto pb-4 lg:pb-0 scrollbar-none">
-          {whatWeEnable.outcomes.map((outcome: any, i: number) => (
+          {whatWeEnable.outcomes.map((outcome, i) => (
             <motion.div
               key={outcome.number}
               className="flex-shrink-0 w-[260px] lg:w-auto relative p-6 border group cursor-default"
@@ -74,7 +74,7 @@ export default function WhatWeEnable() {
               </h3>
 
               <ul className="space-y-2">
-                {outcome.items.map((item: any) => (
+                {outcome.items.map((item) => (
                   <li key={item} className="flex items-start gap-2">
                     <div
                       className="w-1 h-1 rounded-full mt-2 flex-shrink-0"

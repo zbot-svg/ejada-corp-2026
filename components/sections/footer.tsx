@@ -44,7 +44,7 @@ export default function Footer() {
           </div>
 
           {/* Link columns */}
-          {footer.links.map((col: any, ci: number) => (
+          {footer.links.map((col, ci) => (
             <div key={col.heading}>
               <div
                 className="text-[9px] font-bold uppercase tracking-[0.22em] mb-5"
@@ -53,7 +53,7 @@ export default function Footer() {
                 {col.heading}
               </div>
               <ul className="space-y-3">
-                {col.items.map((item: any, ii: number) => (
+                {col.items.map((item, ii) => (
                   <motion.li key={item}
                     initial={{ opacity: 0, x: -8 }}
                     whileInView={{ opacity: 1, x: 0 }}

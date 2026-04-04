@@ -11,7 +11,7 @@ import { ArrowButton } from '@/components/ui/magnetic-button'
 import { useContent } from '@/lib/content-context'
 
 function SectorContent({ id, content }: { id: string; content: ReturnType<typeof useContent> }) {
-  const sector = content.sectors.find((s: any) => s.id === id)
+  const sector = content.sectors.find(s => s.id === id)
   if (!sector) return null
   const { highlight, caseStudies } = sector
 
@@ -42,7 +42,7 @@ function SectorContent({ id, content }: { id: string; content: ReturnType<typeof
 
           {/* Metrics */}
           <div className="flex flex-wrap gap-8 mb-8 pb-8 border-b" style={{ borderColor: 'var(--color-border)' }}>
-            {highlight.metrics.map((m: any) => (
+            {highlight.metrics.map((m) => (
               <div key={m.label}>
                 <div
                   className="text-3xl font-black leading-none"
@@ -59,7 +59,7 @@ function SectorContent({ id, content }: { id: string; content: ReturnType<typeof
 
           {/* Outcome tags */}
           <div className="flex flex-wrap gap-2">
-            {highlight.outcomes.map((outcome: any) => (
+            {highlight.outcomes.map((outcome) => (
               <span
                 key={outcome}
                 className="px-3 py-1.5 text-xs font-semibold"
@@ -119,7 +119,7 @@ function SectorContent({ id, content }: { id: string; content: ReturnType<typeof
             {content.sectorsSection.caseStudiesLabel}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {caseStudies.map((cs: any, i: number) => (
+            {caseStudies.map((cs, i) => (
               <CaseStudyCard
                 key={cs.title}
                 badge={cs.status}
@@ -171,7 +171,7 @@ export default function Sectors() {
 
         {/* Tabs — morphing indicator + directional crossfade */}
         <SectorTabs
-          tabs={pageContent.sectors.map((s: any) => ({ id: s.id, label: s.label }))}
+          tabs={pageContent.sectors.map(s => ({ id: s.id, label: s.label }))}
           renderContent={(id) => <SectorContent id={id} content={pageContent} />}
         />
       </div>

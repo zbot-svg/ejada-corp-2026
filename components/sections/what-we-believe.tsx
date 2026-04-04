@@ -57,7 +57,7 @@ export default function WhatWeBelieve() {
         </div>
 
         <Stagger stagger={0.12} direction="up" distance={40} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {whatWeBelieve.beliefs.map((belief: any) => (
+          {whatWeBelieve.beliefs.map((belief) => (
             <motion.div
               key={belief.number}
               className="relative p-8 border group cursor-default"

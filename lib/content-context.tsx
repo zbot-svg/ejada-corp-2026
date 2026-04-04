@@ -4,8 +4,8 @@ import { createContext, useContext, ReactNode } from 'react'
 import { pageContent } from './content'
 import { pageContentAr } from './content-ar'
 
-export type Locale = 'en' | 'ar'
 export type PageContent = typeof pageContent
+export type Locale = 'en' | 'ar'
 
 interface LocaleContextValue {
   locale: Locale
@@ -22,14 +22,11 @@ const LocaleContext = createContext<LocaleContextValue>({
 export function ContentProvider({
   locale,
   children,
-  cmsContent,
 }: {
   locale: Locale
   children: ReactNode
-  cmsContent?: PageContent
 }) {
-  const staticContent = locale === 'ar' ? pageContentAr : pageContent
-  const content = cmsContent || staticContent
+  const content = locale === 'ar' ? pageContentAr : pageContent
   const isRTL = locale === 'ar'
   return (
     <LocaleContext.Provider value={{ locale, content, isRTL }}>
@@ -38,10 +35,12 @@ export function ContentProvider({
   )
 }
 
+/** Returns the locale-appropriate page content */
 export function useContent(): PageContent {
   return useContext(LocaleContext).content
 }
 
+/** Returns locale metadata (locale code, isRTL) */
 export function useLocale() {
   const { locale, isRTL } = useContext(LocaleContext)
   return { locale, isRTL }

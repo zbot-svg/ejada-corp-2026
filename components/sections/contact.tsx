@@ -82,7 +82,7 @@ export default function Contact() {
                   { label: pageContent.contact.contactLabels.address, value: contact.address },
                   { label: pageContent.contact.contactLabels.email, value: contact.email },
                   { label: pageContent.contact.contactLabels.phone, value: contact.phone },
-                ].map((item: any) => (
+                ].map(item => (
                   <div key={item.label} className="flex gap-4">
                     <div className="w-16 text-xs font-bold uppercase tracking-widest pt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
                       {item.label}
@@ -127,7 +127,7 @@ export default function Contact() {
                     {[
                       { name: 'name', label: pageContent.contact.formLabels.name, type: 'text' },
                       { name: 'company', label: pageContent.contact.formLabels.company, type: 'text' },
-                    ].map((field: any) => (
+                    ].map(field => (
                       <div key={field.name} className="relative">
                         <input
                           type={field.type}
@@ -147,7 +147,7 @@ export default function Contact() {
                     {[
                       { name: 'email', label: pageContent.contact.formLabels.email, type: 'email' },
                       { name: 'phone', label: pageContent.contact.formLabels.phone, type: 'tel' },
-                    ].map((field: any) => (
+                    ].map(field => (
                       <div key={field.name} className="relative">
                         <input
                           type={field.type}
@@ -175,7 +175,7 @@ export default function Contact() {
                     }}
                   >
                     <option value="" disabled style={{ background: '#001081' }}>{pageContent.contact.formLabels.sector}</option>
-                    {pageContent.contact.sectorOptions.map((s: string) => (
+                    {pageContent.contact.sectorOptions.map(s => (
                       <option key={s} value={s} style={{ background: '#001081' }}>{s}</option>
                     ))}
                   </select>
